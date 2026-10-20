@@ -1,108 +1,138 @@
 /*
   =============================================================================
-  2. JAVASCRIPT & ISOMETRIC MATRIX LOGIC COMMENTARY
-  Target Commentary Contribution: ~250 words
+  JAVASCRIPT & ISOMETRIC STACK ENGINE COMMENTARY
+  Word Count Target Contribution: ~270 words
   =============================================================================
-  ISOMETRIC STACK ALGORITHM:
-  To programmatically build the dense paper pile shown in the design reference, 
-  the script dynamically calculates `translateZ` spatial offsets for each sheet.
-  Given `N` sheets, layer `i` receives a base transform:
-  `translate3d(0, 0, i * stackSpacing px)`
+  1. DENSE PAPER STACK GENERATION:
+     To replicate the line-art density in the reference image (which consists of 30+ 
+     thin layered sheets), this script dynamically spawns 36 `.paper-sheet` elements. 
+     Each sheet is assigned a Z-axis offset in orthographic 3D space:
+     `translateZ(i * 3.5px)`
+     
+     This creates a continuous vertical column of crisp paper edges.
 
-  INTERACTION STATES & EVENT HANDLING:
-  1. Hover State (Peek): Handled via CSS hover transforms relative to current Z-height.
-  2. Active Click (Extraction):
-     When a user clicks a layer, the script toggles the `.is-extracted` class. 
-     The target sheet translates -260px along the isometric X/Y plane, decoupling 
-     itself from the pile stack while triggering the detail drawer (`#detailPanel`).
-  3. Focus Management & Keyboard Accessibility:
-     Full keyboard listener supports Up/Down Arrow navigation through layers, 
-     `Enter` key extraction, and `Escape` key return.
+  2. ISOMETRIC MOTION ALGORITHM:
+     Because the stack container uses an orthographic matrix transform (`rotateX(60deg) 
+     rotate(-45deg)`), translating an element along its local Y-axis (`translateY(...)`) 
+     moves it along the screen's lower-left isometric vector line.
+     - Hover State: Applies `translateY(45px)` offset.
+     - Click Extraction: Applies `translateY(220px)` offset, decoupling the sheet 
+       from the pile while populating and opening the specification drawer (`#drawer`).
+
+  3. STATE MANAGEMENT & ACCESSIBILITY:
+     - Clear Toggle State: Clicking an extracted sheet or pressing the `Escape` key 
+       resets all active sheet transformations and smoothly hides the detail panel.
   =============================================================================
 */
 
 document.addEventListener('DOMContentLoaded', () => {
   const stackContainer = document.getElementById('stackContainer');
-  const detailPanel = document.getElementById('detailPanel');
+  const drawer = document.getElementById('drawer');
   const closeBtn = document.getElementById('closeBtn');
-  const statusHud = document.getElementById('statusHud');
-  const panelTitle = document.getElementById('panelTitle');
-  const panelTag = document.getElementById('panelTag');
-  const panelBody = document.getElementById('panelBody');
+  const hudStatus = document.getElementById('hudStatus');
+  const drawerTag = document.getElementById('drawerTag');
+  const drawerTitle = document.getElementById('drawerTitle');
+  const drawerDesc = document.getElementById('drawerDesc');
+  const specDim = document.getElementById('specDim');
+  const specWeight = document.getElementById('specWeight');
+  const specFinish = document.getElementById('specFinish');
 
-  // Section Data Source
-  const sections = [
-    { id: '01', title: 'SIZE', desc: 'Standardized ISO 216 dimensions ranging from A0 to A8 formats. Technical ratios maintain precise 1:√2 aspect proportions across all print cuts.' },
-    { id: '02', title: 'FORMAT', desc: 'Page folding layouts, binding signatures, and structural grid configurations optimized for editorial and archival publication design.' },
-    { id: '03', title: 'STOCK', desc: 'Uncoated cotton rag, high-opacity matte coated, and recycled cellulose fibers evaluated by density (GSM), grain direction, and tactile finish.' },
-    { id: '04', title: 'GRID', desc: 'Modular typographical frameworks, baseline rhythms, and fluid column margins calculated for high-density editorial readability.' },
-    { id: '05', title: 'BINDING', desc: 'Smyth-sewn, thread-bound, and cold-glue perfect binding techniques tested for lie-flat opening capability and structural longevity.' }
-  ];
+  // Labeled Sections Data
+  const sectionsData = {
+    'SIZE': {
+      tag: 'SECTION // 01',
+      desc: 'Standardized ISO 216 paper dimensions ranging from A0 to A8 formats. Maintains exact 1:√2 aspect proportions across all print cuts.',
+      dim: '210 × 297 mm (A4)',
+      weight: '120 GSM',
+      finish: 'Uncoated Cotton Rag'
+    },
+    'FORMAT': {
+      tag: 'SECTION // 02',
+      desc: 'Page folding signatures, grid templates, and publication imposition configurations designed for editorial layout systems.',
+      dim: '16-Page Signature',
+      weight: '150 GSM',
+      finish: 'Satin Matte Coated'
+    },
+    'STOCK': {
+      tag: 'SECTION // 03',
+      desc: 'Physical paper fiber composition, grain direction, and tactile surface opacity specs evaluated for print ink absorption.',
+      dim: 'Bulk Density 1.3',
+      weight: '300 GSM',
+      finish: 'Textured Recycled Board'
+    }
+  };
 
-  // Filler Sheets to create dense physical paper stack thickness
-  const TOTAL_LAYERS = 24; 
-  const SPACING = 4.5; // Z-axis spacing between paper layers in pixels
+  const TOTAL_SHEETS = 36;
+  const SPACING = 3.5; // Z-spacing between sheets in pixels
   let activeSheet = null;
 
-  // Build Paper Stack Layers
-  function renderStack() {
+  // Generate Isometric Paper Pile
+  function buildStack() {
     stackContainer.innerHTML = '';
 
-    for (let i = 0; i < TOTAL_LAYERS; i++) {
+    for (let i = 0; i < TOTAL_SHEETS; i++) {
       const sheet = document.createElement('div');
       sheet.className = 'paper-sheet';
       
-      // Calculate Z-axis offset height
-      const zOffset = i * SPACING;
-      sheet.style.transform = `translate3d(0px, 0px, ${zOffset}px)`;
+      const zOffset = `${i * SPACING}px`;
+      sheet.style.setProperty('--z-offset', zOffset);
+      sheet.style.transform = `translateZ(${zOffset})`;
       sheet.style.zIndex = i;
 
-      // Check if layer corresponds to a labeled primary section
-      const sectionIndex = Math.floor((i / TOTAL_LAYERS) * sections.length);
-      const isLabeled = (i % Math.floor(TOTAL_LAYERS / sections.length) === 2);
-
-      if (isLabeled && sections[sectionIndex]) {
-        const data = sections[sectionIndex];
-        sheet.innerHTML = `
-          <span class="sheet-number">/ ${data.id}</span>
-          <span class="sheet-label">${data.title}</span>
-        `;
-        sheet.dataset.title = data.title;
-        sheet.dataset.id = data.id;
-        sheet.dataset.desc = data.desc;
+      // Assign bold section labels at specific layer indexes
+      if (i === 12) {
+        sheet.innerHTML = `<div class="sheet-label">SIZE</div>`;
+        sheet.dataset.label = 'SIZE';
+      } else if (i === 20) {
+        sheet.innerHTML = `<div class="sheet-label">FORMAT</div>`;
+        sheet.dataset.label = 'FORMAT';
+      } else if (i === 28) {
+        sheet.innerHTML = `<div class="sheet-label">STOCK</div>`;
+        sheet.dataset.label = 'STOCK';
       }
 
-      // Click Handler for Extraction
-      sheet.addEventListener('click', () => handleSheetClick(sheet, i));
-      
+      // Sheet Click Listener
+      sheet.addEventListener('click', () => handleSheetClick(sheet));
+
       stackContainer.appendChild(sheet);
     }
   }
 
-  function handleSheetClick(sheet, index) {
-    // If clicking already extracted sheet, return it
+  function handleSheetClick(sheet) {
+    const label = sheet.dataset.label;
+
+    // If clicking the already extracted sheet, return it
     if (sheet.classList.contains('is-extracted')) {
       resetStack();
       return;
     }
 
-    // Reset any previously extracted sheet
     resetStack();
 
-    // Extract Selected Sheet
+    // Extract target sheet
     activeSheet = sheet;
     sheet.classList.add('is-extracted');
 
-    // Populate and open Detail Panel
-    const title = sheet.dataset.title || 'ARCHIVE LAYER';
-    const id = sheet.dataset.id || '00';
-    const desc = sheet.dataset.desc || 'Structural paper layer inside the isometric pile.';
+    // Update Drawer Data if labeled
+    if (label && sectionsData[label]) {
+      const data = sectionsData[label];
+      drawerTag.innerText = data.tag;
+      drawerTitle.innerText = label;
+      drawerDesc.innerText = data.desc;
+      specDim.innerText = data.dim;
+      specWeight.innerText = data.weight;
+      specFinish.innerText = data.finish;
+    } else {
+      drawerTag.innerText = 'LAYER // ARCHIVE';
+      drawerTitle.innerText = 'UNLABELED STOCK';
+      drawerDesc.innerText = 'Blank paper stock sheet inside the isometric proofing stack.';
+      specDim.innerText = 'Custom Cut';
+      specWeight.innerText = '80 GSM';
+      specFinish.innerText = 'Standard Bond';
+    }
 
-    panelTitle.innerText = title;
-    panelTag.innerText = `SECTION // ${id}`;
-    panelBody.innerText = desc;
-    detailPanel.classList.add('is-open');
-    statusHud.innerText = `Extracted: ${title}`;
+    drawer.classList.add('is-open');
+    hudStatus.innerText = `STATUS: EXTRACTED (${label || 'BLANK SHEET'})`;
   }
 
   function resetStack() {
@@ -110,18 +140,15 @@ document.addEventListener('DOMContentLoaded', () => {
       activeSheet.classList.remove('is-extracted');
       activeSheet = null;
     }
-    detailPanel.classList.remove('is-open');
-    statusHud.innerText = 'Stack Mode: Active';
+    drawer.classList.remove('is-open');
+    hudStatus.innerText = 'STATUS: STACK IDLE';
   }
 
   closeBtn.addEventListener('click', resetStack);
 
-  // Keyboard Controls
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      resetStack();
-    }
+    if (e.key === 'Escape') resetStack();
   });
 
-  renderStack();
+  buildStack();
 });

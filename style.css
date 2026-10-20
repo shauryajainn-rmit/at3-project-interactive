@@ -1,37 +1,37 @@
 /* 
   =============================================================================
-  1. DESIGN & AESTHETICS COMMENTARY (Context, Style & Usability)
-  Target Commentary Contribution: ~170 words
+  DESIGN & AESTHETIC COMMENTARY (Context, Style & Usability)
+  Word Count Contribution: ~180 words
   =============================================================================
-  CONTEXT & EDITORIAL ARTISTIC STATEMENT:
-  Inspired by physical print proofing stacks and brutalist archive typography 
-  (Jordanova, 2020)[cite: 1, 2], this interface converts standard web navigation into a 
-  tactile, 3D paper stack. The architectural black-and-white aesthetic (#ffffff 
-  sheets with crisp 2px #000000 borders) references tactile stock catalogs and 
-  print production workflows.
+  1. CONTEXT & ARTISTIC RATIONALE:
+     This prototype references physical graphic design stock catalogs and architectural 
+     print proofing stacks (Jordanova, 2020; Comeau, 2023). By utilizing orthographic 
+     isometric projections (sharp 1.5px black outlines on pure white paper backgrounds), 
+     the digital browser window mimics a physical vector technical drawing.
 
-  USABILITY & AFFORDANCES:
-  - 3D Depth Affordances: Sheets are rendered in true 3D spatial perspective 
-    using CSS `preserve-3d` and matrix rotation (rotateX: 58deg, rotateZ: -38deg).
-  - Hover Peek State: Hovering over any layer slides the sheet smoothly outward 
-    along its isometric axis (-35px X/Y offset), providing clear feedback and 
-    exposing the label text.
-  - Extraction State: Clicking a sheet pulls it completely out of the stack 
-    (-280px axis slide) and shifts context to reveal the section details panel.
+  2. USABILITY & AFFORDANCES:
+     - True Orthographic Isometric Projection: Unlike 3D perspective distortion, 
+       applying `rotateX(60deg) rotate(-45deg)` without perspective constraints keeps 
+       all parallel edges aligned, perfectly recreating the technical line-art aesthetic.
+     - Hover Peeking: Hovering over any labeled sheet translates it outward along 
+       its local 2D isometric axis (`translateY(45px)`), revealing hidden text labels.
+     - Click Extraction: Clicking a paper sheet extracts it completely from the pile 
+       (`translateY(220px)`), opening the detail panel drawer on the right.
 
-  ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
-  - Slow In & Slow Out: Custom cubic-bezier curves (0.16, 1, 0.3, 1) simulate 
-    natural friction and paper mass during slide out and return transitions[cite: 1].
+  3. ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
+     - Slow In & Slow Out: Custom `cubic-bezier(0.16, 1, 0.3, 1)` easing gives each 
+       paper layer physical friction and realistic weight during slide-out interactions.
   =============================================================================
 */
 
 :root {
-  --bg-color: #f2f2f0;
+  --bg-color: #f6f6f4;
   --paper-bg: #ffffff;
-  --ink-black: #050505;
+  --ink-black: #000000;
   --line-color: #000000;
-  --accent-gray: #e2e2df;
-  --font-mono: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --text-muted: #666666;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
 }
 
 * {
@@ -44,16 +44,20 @@
 body {
   background-color: var(--bg-color);
   color: var(--ink-black);
-  font-family: var(--font-mono);
-  min-height: 100vh;
+  font-family: var(--font-sans);
+  height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* Top Navigation Header */
-header {
-  padding: 28px 40px;
+/* Header */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 32px 40px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
@@ -61,60 +65,59 @@ header {
   pointer-events: none;
 }
 
-.brand-title {
-  font-size: 1rem;
-  font-weight: 800;
+.brand h1 {
+  font-size: 1.1rem;
+  font-weight: 900;
   letter-spacing: -0.5px;
-  text-transform: uppercase;
   pointer-events: auto;
 }
 
-.brand-subtitle {
+.subtitle {
   font-size: 0.8rem;
-  color: #666;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
-.status-hud {
-  font-size: 0.8rem;
-  font-family: monospace;
-  text-transform: uppercase;
-  background: #fff;
-  padding: 6px 14px;
+.hud-status {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: bold;
+  background: var(--paper-bg);
   border: 1.5px solid var(--ink-black);
+  padding: 6px 14px;
   pointer-events: auto;
 }
 
-/* Main Spatial Viewport Stage */
-.viewport-stage {
+/* Viewport Area */
+.viewport {
   flex: 1;
-  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  perspective: 1400px;
-  perspective-origin: 50% 30%;
+  position: relative;
 }
 
-/* 3D Isometric Stack Container */
+/* Orthographic Isometric Stack Container */
 .stack-container {
   position: relative;
-  width: 320px;
-  height: 440px;
+  width: 260px;
+  height: 360px;
+  /* Orthographic Isometric Matrix Transform */
+  transform: rotateX(60deg) rotate(-45deg);
   transform-style: preserve-3d;
-  transform: rotateX(58deg) rotateZ(-38deg) translateZ(0px);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Individual Paper Sheet Layers */
+/* Individual Paper Sheet */
 .paper-sheet {
   position: absolute;
-  inset: 0;
-  background: var(--paper-bg);
-  border: 2px solid var(--line-color);
-  box-shadow: -1px 1px 0px rgba(0,0,0,0.8), -3px 3px 0px rgba(0,0,0,0.15);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--paper-bg);
+  border: 1.5px solid var(--ink-black);
   cursor: pointer;
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -122,114 +125,102 @@ header {
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
 }
 
-/* Paper Edge Stack Filler Lines (Creates thick pile illusion) */
-.paper-sheet::before {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: -2px;
-  right: -2px;
-  height: 4px;
-  background: var(--paper-bg);
-  border: 1.5px solid var(--line-color);
-  border-top: none;
-}
-
-/* Bold Typography Label on Sheet */
+/* Bold Typography on Labeled Sheets */
 .sheet-label {
-  font-size: 2.8rem;
+  font-size: 3.2rem;
   font-weight: 900;
-  letter-spacing: -1.5px;
+  letter-spacing: -2px;
   text-transform: uppercase;
-  line-height: 0.9;
+  line-height: 0.85;
+  color: var(--ink-black);
   pointer-events: none;
 }
 
-.sheet-number {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  font-size: 0.85rem;
-  font-family: monospace;
-  font-weight: bold;
-}
-
-/* HOVER STATE: Smooth Slide Out Along Isometric Plane */
+/* HOVER STATE: Slides out along the lower-left isometric axis */
 .paper-sheet:hover:not(.is-extracted) {
-  transform: translate3d(-35px, -35px, 15px) !important;
+  transform: translateY(45px) translateZ(var(--z-offset)) !important;
   background-color: #ffffff;
-  box-shadow: -4px 4px 0px #000, -10px 10px 20px rgba(0,0,0,0.15);
+  box-shadow: -4px 4px 0px rgba(0,0,0,0.15);
 }
 
-/* EXTRACTED STATE: Pulled Out of Pile */
+/* EXTRACTED STATE: Pulled completely out of the pile */
 .paper-sheet.is-extracted {
-  transform: translate3d(-260px, -260px, 80px) !important;
+  transform: translateY(220px) translateZ(calc(var(--z-offset) + 60px)) !important;
   background-color: #ffffff;
-  border-color: var(--line-color);
-  box-shadow: -8px 8px 0px #000, -20px 20px 40px rgba(0,0,0,0.2);
-  z-index: 500 !important;
+  border-width: 2px;
+  box-shadow: -12px 12px 25px rgba(0,0,0,0.18);
+  z-index: 999 !important;
 }
 
-/* Detail Drawer Panel (Revealed upon selection) */
-.detail-panel {
+/* Slide-out Panel Drawer */
+.drawer {
   position: fixed;
-  right: -480px;
   top: 0;
-  width: 440px;
+  right: -420px;
+  width: 380px;
   height: 100vh;
-  background: #ffffff;
-  border-left: 2px solid var(--line-color);
+  background: var(--paper-bg);
+  border-left: 2px solid var(--ink-black);
+  padding: 60px 36px;
   z-index: 200;
-  padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: -10px 0 30px rgba(0,0,0,0.08);
+  transition: right 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.05);
 }
 
-.detail-panel.is-open {
+.drawer.is-open {
   right: 0;
 }
 
-.panel-header {
-  border-bottom: 2px solid var(--line-color);
-  padding-bottom: 20px;
-}
-
-.panel-tag {
-  font-family: monospace;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  color: #666;
-}
-
-.panel-title {
-  font-size: 2.2rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  margin-top: 6px;
-}
-
-.panel-body {
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: #333;
-  margin-block: 20px;
-}
-
 .close-btn {
-  background: var(--ink-black);
-  color: #fff;
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  font-size: 1.8rem;
+  background: none;
   border: none;
-  padding: 14px;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  line-height: 1;
 }
 
-.close-btn:hover {
-  background: #333;
+.drawer-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.drawer-title {
+  font-size: 2.4rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-top: 6px;
+  margin-bottom: 18px;
+  border-bottom: 2px solid var(--ink-black);
+  padding-bottom: 12px;
+}
+
+.drawer-description {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #333333;
+  margin-bottom: 30px;
+}
+
+.spec-table {
+  border-top: 1px solid #e0e0e0;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+}
+
+.spec-row span {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
 }

@@ -3,42 +3,53 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Isometric Paper Stack Navigation</title>
+  <title>Size / Format / Stock - Isometric Paper Stack Navigation</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
 
-  <!-- Header -->
-  <header>
-    <div>
-      <div class="brand-title">Size / Format / Stock</div>
-      <div class="brand-subtitle">Interactive Paper Archive Prototype</div>
+  <!-- Top Header -->
+  <header class="site-header">
+    <div class="brand">
+      <h1>SIZE / FORMAT / STOCK</h1>
+      <p class="subtitle">Interactive Print Stock Archive</p>
     </div>
-    <div class="status-hud" id="statusHud">Stack Mode: Active</div>
+    <div class="hud-status" id="hudStatus">STATUS: STACK IDLE</div>
   </header>
 
-  <!-- Viewport Stage -->
-  <main class="viewport-stage">
+  <!-- Central Isometric Viewport Stage -->
+  <main class="viewport">
     <div class="stack-container" id="stackContainer">
-      <!-- Generated Sheets will be inserted here dynamically -->
+      <!-- 36 Isometric Paper Sheets rendered via script.js -->
     </div>
   </main>
 
-  <!-- Detail Content Panel -->
-  <aside class="detail-panel" id="detailPanel">
-    <div>
-      <div class="panel-header">
-        <div class="panel-tag" id="panelTag">SECTION // 01</div>
-        <h2 class="panel-title" id="panelTitle">FORMAT</h2>
-      </div>
-      <p class="panel-body" id="panelBody">
-        Select a paper sheet from the isometric stack to extract its spec sheet. 
-        Each layer represents physical print stock variables including dimensions, 
-        weight ratio, surface texture, and binding mechanisms.
+  <!-- Slide-Out Section Drawer (Triggered on Click) -->
+  <aside class="drawer" id="drawer">
+    <button class="close-btn" id="closeBtn" aria-label="Close panel">&times;</button>
+    <div class="drawer-content">
+      <span class="drawer-tag" id="drawerTag">SECTION // 01</span>
+      <h2 class="drawer-title" id="drawerTitle">SIZE</h2>
+      <p class="drawer-description" id="drawerDesc">
+        Standardized ISO paper dimensions and aspect ratios. Select individual stock sheets to inspect physical weight, surface grain, and trim specifications.
       </p>
+      
+      <div class="spec-table">
+        <div class="spec-row">
+          <span>DIMENSIONS</span>
+          <strong id="specDim">210 × 297 mm</strong>
+        </div>
+        <div class="spec-row">
+          <span>WEIGHT</span>
+          <strong id="specWeight">120 GSM Uncoated</strong>
+        </div>
+        <div class="spec-row">
+          <span>FINISH</span>
+          <strong id="specFinish">Smooth Matte Cotton</strong>
+        </div>
+      </div>
     </div>
-    <button class="close-btn" id="closeBtn">Return Sheet to Stack</button>
   </aside>
 
 </body>
