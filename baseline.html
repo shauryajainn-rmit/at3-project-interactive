@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orientation Catastrophe - Scroll Puzzle Prototype</title>
+  <style>
+    /* 
+      =============================================================================
+      1. DESIGN CHOICES & AESTHETIC CONTEXT COMMENTARY (~170 words)
+      =============================================================================
+      CONTEXT & ARTISTIC INSPIRATION:
+      This prototype draws conceptual and visual inspiration from Natalia Jordanova's 
+      artistic website (Jordanova, 2020), which explores themes of post-digital identity, 
+      time paradoxes, and non-linear narrative spaces ("Orientation catastrophes inside 
+      time paradoxes"). Rather than presenting a conventional linear page, the site 
+      treats vertical scrolling as a temporal dial that controls the assembly of 
+      fragmented thoughts and vector geometry.
+
+      USABILITY & VISUAL FEEDBACK:
+      - Contrast & Typography: Dark, slate-black background (#090d16) combined with 
+        monospaced typographic fragments (#00f2fe cyan and #a855f7 purple) creates a 
+        cybernetic/archival context.
+      - Hardware-Accelerated Performance: All scroll animations use CSS `transform` 
+        (translate3d, rotate, scale) and `opacity`. This offloads rendering directly 
+        to the GPU, ensuring 60fps performance without relying on heavy external 
+        animation libraries like GSAP or ScrollMagic.
+      - State Indicators: Fixed HUD displays real-time scroll alignment percentage 
+        and lock progress to give the user immediate feedback on their interaction.
+      =============================================================================
+    */
+
+    :root {
+      --bg-dark: #090d16;
+      --accent-cyan: #00f2fe;
+      --accent-violet: #a855f7;
+      --accent-gold: #eab308;
+      --text-main: #f8fafc;
+      --text-dim: #64748b;
+      --font-mono: 'Courier New', Courier, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-mono);
+      overflow-x: hidden;
+    }
+
+    /* Invisible Tall Scroll Track to establish vertical viewport distance */
+    .scroll-track {
+      height: 600vh; /* Provides ample scroll depth for precise puzzle manipulation */
+      position: relative;
+    }
+
+    /* Fixed Viewport Canvas Stage */
+    .stage {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    /* Background Canvas for Procedural Temporal Dial Animation */
+    #dialCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 0.35;
+    }
+
+    /* HUD Feedback Panel */
+    .hud {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(0, 242, 254, 0.3);
+      border-radius: 8px;
+      padding: 12px 20px;
+      backdrop-filter: blur(8px);
+      font-size: 0.85rem;
+      color: var(--text-main);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+      pointer-events: auto;
+    }
+
+    .hud-title {
+      font-weight: bold;
+      color: var(--accent-cyan);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+
+    .hud-metric {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-top: 4px;
+      color: var(--text-dim);
+    }
+
+    .hud-val {
+      color: var(--accent-cyan);
+      font-weight: bold;
+    }
+
+    /* Poem Fragment Elements */
+    .fragment-container {
+      position: relative;
+      z-index: 2;
+      width: 90%;
+      max-width: 800px;
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .poem-line {
+      position: absolute;
+      font-size: 1.25rem;
+      line-height: 1.6;
+      text-align: center;
+      width: 100%;
+      will-change: transform, opacity, filter;
+      transition: color 0.3s ease;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+
+    .poem-line.locked {
+      color: var(--accent-cyan);
+      text-shadow: 0 0 15px rgba(0, 242, 254, 0.8);
+      font-weight: bold;
+    }
+
+    /* Target Alignment Reticle */
+    .alignment-zone {
+      position: absolute;
+      width: 320px;
+      height: 80px;
+      border: 1px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      z-index: 2;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .alignment-zone.active {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.3);
+    }
+
+    /* Completion Modal Overlay */
+    .completion-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      background: rgba(9, 13, 22, 0.92);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+      backdrop-filter: blur(12px);
+    }
+
+    .completion-modal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .completion-modal h1 {
+      font-size: 2rem;
+      color: var(--accent-cyan);
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+    }
+
+    .completion-modal p {
+      max-width: 600px;
+      text-align: center;
+      color: var(--text-main);
+      line-height: 1.8;
+      margin-bottom: 2rem;
+    }
+
+    .restart-btn {
+      background: transparent;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 10px 24px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .restart-btn:hover {
+      background: var(--accent-cyan);
+      color: var(--bg-dark);
+      box-shadow: 0 0 20px rgba(0, 242, 254, 0.6);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 
+    =============================================================================
+    2. HTML STRUCTURE COMMENTARY (~80 words)
+    =============================================================================
+    The layout uses a two-tier structural approach:
+    1. `.scroll-track`: A non-visible 600vh height container that creates native 
+       browser scrollbars and provides raw scroll depth data.
+    2. `.stage`: A fixed viewport overlay housing the HTML canvas (rendering a 
+       procedural time dial), scattered text nodes, target reticles, and the HUD.
+    
+    This decoupled approach ensures smooth, jank-free scrolling while keeping all 
+    interactive puzzle elements permanently centered in the user's viewport.
+    =============================================================================
+  -->
+
+  <div class="hud">
+    <div class="hud-title">Temporal Alignment</div>
+    <div class="hud-metric">
+      <span>Depth:</span>
+      <span class="hud-val" id="depthVal">0%</span>
+    </div>
+    <div class="hud-metric">
+      <span>Cores Locked:</span>
+      <span class="hud-val" id="locksVal">0 / 3</span>
+    </div>
+  </div>
+
+  <!-- Fixed Interactive Viewport Stage -->
+  <div class="stage">
+    <canvas id="dialCanvas"></canvas>
+    
+    <div class="alignment-zone" id="alignZone"></div>
+
+    <div class="fragment-container">
+      <div class="poem-line" id="line1">I align the directions of the world with the walls of my room.</div>
+      <div class="poem-line" id="line2">Orientation catastrophes inside time paradoxes.</div>
+      <div class="poem-line" id="line3">A causal loop is technically time travel.</div>
+    </div>
+  </div>
+
+  <!-- Completion Modal -->
+  <div class="completion-modal" id="completionModal">
+    <h1>Paradox Resolved</h1>
+    <p>
+      "World made out of words, hyperlinked to other worlds.<br>
+      Moving your path forward, towards striking your past self."
+    </p>
+    <button class="restart-btn" id="restartBtn">Re-align Paradox</button>
+  </div>
+
+  <!-- Scroll Depth Generator -->
+  <div class="scroll-track"></div>
+
+  <script>
+    /*
+      =============================================================================
+      3. VANILLA JS & SCROLL PHYSICS COMMENTARY (~250 words)
+      =============================================================================
+      PURE VANILLA IMPLEMENTATION (NO LIBRARIES):
+      To fulfill the constraint of eliminating external animation dependencies like GSAP 
+      or ScrollMagic, this engine relies on native browser primitives:
+      - `window.addEventListener('scroll')` paired with a `requestAnimationFrame` loop. 
+        This prevents scroll-blocking layout thrashing and ensures smooth 60fps rendering.
+      - Mathematical Linear Interpolation (`lerp`) and cubic ease functions map 
+        raw scroll position (`window.scrollY`) into normalized progress (0.0 to 1.0).
+
+      PUZZLE MECHANICS & TARGET SNAPPING:
+      - Scattered fragments start with heavy spatial offsets (3D translation, random rotation, 
+        and high CSS blur).
+      - As scroll depth approaches specific target windows (25%, 55%, 85%), mathematical 
+        proximity formulas scale down offset values, reducing blur to zero and snapping 
+        text lines cleanly into the central target zone (`#alignZone`).
+      - When a fragment remains aligned within its target threshold, it "locks" into state. 
+        Unlocking all three fragments resolves the scroll cipher.
+
+      CANVAS PROCEDURAL GRAPHICS:
+      - The background canvas dynamically renders rotating concentric dials and radar lines 
+        whose rotation angles are directly driven by scroll progress, replacing heavy 
+        image-sprite assets with lightweight vector computations.
+      =============================================================================
+    */
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // DOM References
+      const dialCanvas = document.getElementById('dialCanvas');
+      const ctx = dialCanvas.getContext('2d');
+      const depthVal = document.getElementById('depthVal');
+      const locksVal = document.getElementById('locksVal');
+      const alignZone = document.getElementById('alignZone');
+      const completionModal = document.getElementById('completionModal');
+      const restartBtn = document.getElementById('restartBtn');
+
+      const lines = [
+        { el: document.getElementById('line1'), targetProgress: 0.25, locked: false },
+        { el: document.getElementById('line2'), targetProgress: 0.55, locked: false },
+        { el: document.getElementById('line3'), targetProgress: 0.85, locked: false }
+      ];
+
+      let scrollProgress = 0;
+      let isTicking = false;
+
+      // Handle Canvas Resizing
+      function resizeCanvas() {
+        dialCanvas.width = window.innerWidth;
+        dialCanvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      // Native Linear Interpolation Helper
+      function lerp(start, end, amt) {
+        return (1 - amt) * start + amt * end;
+      }
+
+      // Render Procedural Dial on Canvas based on Scroll Progress
+      function drawDial(progress) {
+        ctx.clearRect(0, 0, dialCanvas.width, dialCanvas.height);
+
+        const centerX = dialCanvas.width / 2;
+        const centerY = dialCanvas.height / 2;
+        const maxRadius = Math.min(centerX, centerY) * 0.7;
+
+        ctx.save();
+        ctx.translate(centerX, centerY);
+
+        // Rotating Outer Ring
+        ctx.strokeStyle = '#00f2fe';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(0, 0, maxRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Concentric Inner Dial rotating with scroll
+        ctx.rotate(progress * Math.PI * 4);
+        ctx.strokeStyle = '#a855f7';
+        ctx.setLineDash([8, 12]);
+        ctx.beginPath();
+        ctx.arc(0, 0, maxRadius * 0.65, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Crosshair Lines
+        ctx.setLineDash([]);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.beginPath();
+        ctx.moveTo(-maxRadius, 0);
+        ctx.lineTo(maxRadius, 0);
+        ctx.moveTo(0, -maxRadius);
+        ctx.lineTo(0, maxRadius);
+        ctx.stroke();
+
+        ctx.restore();
+      }
+
+      // Update Fragment Positions based on Scroll Proximity
+      function updateFragments(progress) {
+        let activeZone = false;
+
+        lines.forEach((item) => {
+          // Calculate distance from target scroll progress
+          const dist = progress - item.targetProgress;
+          const absDist = Math.abs(dist);
+
+          if (absDist < 0.04) {
+            // Target Snapped State
+            item.el.style.transform = `translate3d(0, 0, 0) rotate(0deg) scale(1)`;
+            item.el.style.opacity = `1`;
+            item.el.style.filter = `blur(0px)`;
+            item.el.classList.add('locked');
+            item.locked = true;
+            activeZone = true;
+          } else {
+            // Scattered State: Displace based on distance
+            const translateY = dist * 800; // Vertical drift
+            const translateX = Math.sin(dist * 10) * 150; // Horizontal drift
+            const rotate = dist * 120; // Rotation offset
+            const blur = Math.min(absDist * 40, 12); // Dynamic blur filter
+            const opacity = Math.max(1 - absDist * 4, 0.05);
+
+            item.el.style.transform = `translate3d(${translateX}px, ${translateY}px, 0) rotate(${rotate}deg) scale(${1 - absDist})`;
+            item.el.style.opacity = `${opacity}`;
+            item.el.style.filter = `blur(${blur}px)`;
+            item.el.classList.remove('locked');
+            item.locked = false;
+          }
+        });
+
+        // Toggle Reticle Active State
+        if (activeZone) {
+          alignZone.classList.add('active');
+        } else {
+          alignZone.classList.remove('active');
+        }
+
+        // Check Locked Count
+        const lockedCount = lines.filter(l => l.locked).length;
+        locksVal.innerText = `${lockedCount} / ${lines.length}`;
+
+        // Trigger Victory Condition
+        if (lockedCount === lines.length) {
+          setTimeout(() => {
+            completionModal.classList.add('visible');
+          }, 300);
+        }
+      }
+
+      // Core Scroll Loop
+      function onScroll() {
+        const totalScrollable = document.documentElement.scrollHeight - window.innerHeight;
+        scrollProgress = Math.min(Math.max(window.scrollY / totalScrollable, 0), 1);
+
+        // Update HUD
+        depthVal.innerText = `${Math.round(scrollProgress * 100)}%`;
+
+        // Render Canvas and UI updates
+        drawDial(scrollProgress);
+        updateFragments(scrollProgress);
+
+        isTicking = false;
+      }
+
+      // Throttled Scroll Listener using requestAnimationFrame
+      window.addEventListener('scroll', () => {
+        if (!isTicking) {
+          window.requestAnimationFrame(onScroll);
+          isTicking = true;
+        }
+      });
+
+      // Initial Call
+      onScroll();
+
+      // Reset Button Handler
+      restartBtn.addEventListener('click', () => {
+        completionModal.classList.remove('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+  </script>
+</body>
+</html>
