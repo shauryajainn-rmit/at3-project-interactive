@@ -1,167 +1,122 @@
-/* =============================================================================
-   DESIGN SYSTEM & TOKENS
-   ============================================================================= */
-:root {
-  --bg-color: #0c0c0c;
-  --panel-bg: #141414;
-  --border-color: #262626;
-  --text-main: #f0f0f0;
-  --text-muted: #888888;
-  --accent: #3b82f6;
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'Space Mono', monospace;
-}
-
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: var(--font-display);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 32px;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    overflow: hidden;
+    background-color: #fff;
+    color: #000;
+    font-family: "Times New Roman", Times, serif;
 }
 
-/* Header Navigation */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 24px;
-  margin-bottom: 32px;
+.background-text p {
+    position: relative;
+    margin: 0;
+    font-size: 0.68rem;
+    line-height: 1.1;
+    white-space: pre-line;
 }
 
-.brand h1 {
-  font-size: 1.1rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: -0.5px;
-}
-
-.meta-tag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* Main Bento Workbench Grid */
-.workbench {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 24px;
-  flex: 1;
+.background-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px 16px;
+    align-content: space-between;
+    box-sizing: border-box;
+    padding: 20px;
+    z-index: 0;
+    color: #333;
+    overflow-y: auto;
 }
 
 @media (max-width: 900px) {
-  .workbench {
-    grid-template-columns: 1fr;
-  }
+    .background-text {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
-/* Control Panel Sidebar */
-.control-panel {
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+@media (max-width: 600px) {
+    .background-text {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
-.control-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+/* floating animation */
+@keyframes floatAround {
+    0% {
+        transform: translate(0, 0) rotate(0);
+    }
+    33% {
+        transform: translate(var(--float-x), var(--float-y)) rotate(var(--float-rotation));
+    }
+    66% {
+        transform: translate(calc(var(--float-x) * -1), calc(var(--float-y) * -1)) rotate(calc(var(--float-rotation) * -1));
+    }
+    100% {
+        transform: translate(0, 0) rotate(0);
+    }
 }
 
-.control-group label {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
+.interactive-layer {
+    position: absolute;
+    border: 1px solid #000;
+    background-color: #fff;
+    padding: 15px;
+    animation: floatAround 8s ease-in-out infinite;
+    cursor: grab;
+    z-index: 10;
+    margin: 10px;
 }
 
-.control-group input[type="range"] {
-  width: 100%;
-  accent-color: var(--accent);
-  cursor: pointer;
+.float-fast {
+    animation-duration: 4s;
 }
 
-.value-display {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--text-main);
+.float-medium {
+    animation-duration: 7s;
 }
 
-/* Interactive Display Stage */
-.stage {
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  padding: 48px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  position: relative;
-  overflow: hidden;
+.float-slow {
+    animation-duration: 12s;
 }
 
-.editable-canvas {
-  font-size: var(--dynamic-size, 3rem);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -1.5px;
-  outline: none;
-  word-break: break-word;
-  transition: font-size 0.1s ease;
+.interactive-layer:hover {
+    animation-play-state: paused;
 }
 
-.editable-canvas:focus {
-  color: var(--accent);
+.delay-1 {
+    animation-delay: -2s;
 }
 
-/* Cards Matrix Footer */
-.matrix-footer {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 24px;
+.delay-2 {
+    animation-delay: -4s;
 }
 
-@media (max-width: 768px) {
-  .matrix-footer {
-    grid-template-columns: 1fr;
-  }
+.delay-3 {
+    animation-delay: -6s;
 }
 
-.matrix-card {
-  background: var(--panel-bg);
-  border: 1px solid var(--border-color);
-  padding: 24px;
-  cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
+.delay-4 {
+    animation-delay: -1s;
 }
 
-.matrix-card:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
+.box-text {
+    font-size: 1.2rem;
+    line-height: 1.4;
 }
 
-.matrix-card h3 {
-  font-size: 0.9rem;
-  font-weight: 700;
-  margin-bottom: 8px;
+.box-image {
+    max-width: 200px;
+    display: block;
 }
 
-.matrix-card p {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  line-height: 1.5;
+.interactive-layer.is-dragging {
+    cursor: grabbing;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }

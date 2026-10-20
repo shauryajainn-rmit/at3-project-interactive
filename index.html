@@ -3,145 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scroll Carousel Archive</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-
-    <!-- Stylesheet -->
+    <title>Interactive Gallery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Static Header -->
-    <header>
-        <h3 class="brand-title">Scroll Archive // 01</h3>
-        <div class="scroll-instruction">[ SCROLL TO ROTATE STAGE ]</div>
-    </header>
+    <div class="background-text">
+        <p>Khartoum
+Juba
+N'Djamena
+Niamey
+Lusaka
+Kuwait City
+Riyadh
+Dodoma
+Ouagadougou
+Abu Dhabi
+Doha
+Dhaka
+Harare
+Lomé
+Manama
+Nouakchott
+Accra
+Yamoussoukro
+Lilongwe
+Abuja
+Moroni
+Malé
+Porto-Novo
+Kinshasa
+Brazzaville
+Conakry
+Hanoi
+Tripoli
+Manila
+Baghdad
+Windhoek
+Bamako
+Bissau
+New Delhi
+Libreville
+Bandar Seri Begawan
+Antananarivo
+Jakarta
+Mogadishu
+Djibouti
+Yaoundé
+St John's
+Malabo
+Castries
+Muscat
+Colombo
+São Tomé
+Banjul
+Singapore
+Dakar
+Ngerulmud
+Victoria
+Luanda
+Freetown
+Vientiane
+Gaborone
+Nairobi
+Bangkok
+Tehran
+Taipei
+Kingstown
+Praia
+Monrovia
+Bridgetown
+Yaren
+Funafuti
+Bangui
+Phnom Penh
+Tarawa
+Majuro
+Islamabad
+Saint George's
+Kigali
+Santo Domingo
+Hong Kong
+Georgetown
+Nassau
+Paramaribo
+Pretoria
+Tunis
+Maputo
+Port-au-Prince
+Dili
+Nay Pyi Taw
+Kuala Lumpur
+Sanaa
+Valletta
+Basseterre
+Cairo
+Port of Spain
+Ashgabat
+Panama City
+Kingston
+Roseau
+Honiara
+Apia
+Dushanbe
+Kampala
+Damascus
+Palikir
+Rabat
+Yerevan
+Tirana
+Algiers
+Nicosia
+Caracas
+Port Louis
+Brasília
+Port Moresby
+Athens
+Rome
+Vatican City
+San Salvador
+Belmopan
+Skopje
+Lobamba
+Beirut
+Amman
+Belgrade
+Asunción
+Lima
+Tokyo
+Podgorica
+Managua
+Suva
+Tashkent
+Addis Ababa
+Jerusalem
+Havana
+Vaduz
+Nuku'alofa
+Kathmandu
+Zagreb
+Port Vila
+Asmera
+Bloemfontein
+Tegucigalpa
+Gitega
+Baku
+Bucharest
+Pristina
+Kabul
+Bishkek
+Sarajevo
+Tbilisi
+Lisbon
+Maseru
+Sofia
+Kyiv
+San José
+San Marino
+Seoul
+Ljubljana
+Cape Town
+Monaco
+Guatemala City
+Ankara
+Chișinău
+Madrid
+Dublin
+Andorra la Vella
+Santiago
+Vienna
+Pyongyang
+Montevideo
+Buenos Aires
+Bern
+Budapest
+Canberra
+Paris
+Bogotá
+Minsk
+London
+Warsaw
+Wellington
+Sucre
+Prague
+Vilnius
+Washington D.C.
+Bratislava
+Amsterdam
+Copenhagen
+Moscow
+Luxembourg
+Brussels
+Helsinki
+Mexico City
+Stockholm
+Beijing
+Quito
+Tallinn
+Berlin
+Riga
+La Paz
+Thimphu
+Oslo
+Ottawa
+Reykjavik
+Astana
+Nuuk
+Ulaanbaatar</p>
+    </div>
 
-    <!-- Main Rotating Stage (Driven by Scroll) -->
-    <main id="carouselStage">
-        
-        <!-- CARD 01 -->
-        <div class="section" style="--x: 450px; --y: 0px; --rotate-inner: 0deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <!-- Replace src with your own image paths -->
-                    <img src="https://picsum.photos/id/10/600/400" alt="Project Image 01">
-                </div>
-                <div class="meta-row">
-                    <h4>01 // FOUNDATION</h4>
-                    <h3>Visual Studies</h3>
-                </div>
-            </div>
-        </div>
+<!-- boxes -->
 
-        <!-- CARD 02 -->
-        <div class="section" style="--x: 318px; --y: 318px; --rotate-inner: 45deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/20/600/400" alt="Project Image 02">
-                </div>
-                <div class="meta-row">
-                    <h4>02 // TYPOGRAPHY</h4>
-                    <h3>Variable Forms</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer float-fast" style="left: 15%; top: 20%;">
+        <div class="box-text"> word</div>
+    </div>
 
-        <!-- CARD 03 -->
-        <div class="section" style="--x: 0px; --y: 450px; --rotate-inner: 90deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/30/600/400" alt="Project Image 03">
-                </div>
-                <div class="meta-row">
-                    <h4>03 // SPATIAL GRID</h4>
-                    <h3>Kinetic Layouts</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer delay-1 float-medium" style="left: 45%; top: 35%;">
+        <div class="box-text">cities<br>wow</div>
+    </div>
 
-        <!-- CARD 04 -->
-        <div class="section" style="--x: -318px; --y: 318px; --rotate-inner: 135deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/40/600/400" alt="Project Image 04">
-                </div>
-                <div class="meta-row">
-                    <h4>04 // EXECUTION</h4>
-                    <h3>State Transitions</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer delay-2 float-slow" style="left: 65%; top: 15%;">
+        <img class="box-image" src="https://via.placeholder.com/200x150" alt="Placeholder Image 1">
+    </div>
 
-        <!-- CARD 05 -->
-        <div class="section" style="--x: -450px; --y: 0px; --rotate-inner: 180deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/50/600/400" alt="Project Image 05">
-                </div>
-                <div class="meta-row">
-                    <h4>05 // INTERACTION</h4>
-                    <h3>Telemetry & Feedback</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer delay-3 float-fast" style="left: 25%; top: 60%;">
+        <div class="box-text">Alter-Globalization<br>Movements</div>
+    </div>
 
-        <!-- CARD 06 -->
-        <div class="section" style="--x: -318px; --y: -318px; --rotate-inner: 225deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/60/600/400" alt="Project Image 06">
-                </div>
-                <div class="meta-row">
-                    <h4>06 // ARCHITECTURE</h4>
-                    <h3>Modular Systems</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer delay-4 float-medium" style="left: 70%; top: 55%;">
+        <img class="box-image" src="https://via.placeholder.com/200x200" alt="Placeholder Image 2">
+    </div>
 
-        <!-- CARD 07 -->
-        <div class="section" style="--x: 0px; --y: -450px; --rotate-inner: 270deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/70/600/400" alt="Project Image 07">
-                </div>
-                <div class="meta-row">
-                    <h4>07 // OPTIMIZATION</h4>
-                    <h3>Performance Tuning</h3>
-                </div>
-            </div>
-        </div>
+    <div class="interactive-layer delay-1 float-slow" style="left: 10%; top: 40%;">
+        <div class="box-text">Box 6</div>
+    </div>
+    <div class="interactive-layer delay-2 float-fast" style="left: 80%; top: 30%;">
+        <div class="box-text">Box 7</div>
+    </div>
+    <div class="interactive-layer delay-3 float-medium" style="left: 35%; top: 10%;">
+        <div class="box-text">Box 8</div>
+    </div>
+    <div class="interactive-layer delay-4 float-slow" style="left: 55%; top: 70%;">
+        <div class="box-text">Box 9</div>
+    </div>
+    <div class="interactive-layer float-fast" style="left: 20%; top: 80%;">
+        <div class="box-text">Box 10</div>
+    </div>
+    <div class="interactive-layer delay-1 float-medium" style="left: 85%; top: 80%;">
+        <div class="box-text">Box 11</div>
+    </div>
+    <div class="interactive-layer delay-2 float-slow" style="left: 40%; top: 50%;">
+        <div class="box-text">Box 12</div>
+    </div>
+    <div class="interactive-layer delay-3 float-fast" style="left: 60%; top: 20%;">
+        <div class="box-text">Box 13</div>
+    </div>
+    <div class="interactive-layer delay-4 float-medium" style="left: 5%; top: 60%;">
+        <div class="box-text">Box 14</div>
+    </div>
+    <div class="interactive-layer float-slow" style="left: 75%; top: 10%;">
+        <div class="box-text">Box 15</div>
+    </div>
+    <div class="interactive-layer delay-1 float-fast" style="left: 30%; top: 30%;">
+        <div class="box-text">Box 16</div>
+    </div>
+    <div class="interactive-layer delay-2 float-medium" style="left: 50%; top: 40%;">
+        <div class="box-text">Box 17</div>
+    </div>
+    <div class="interactive-layer delay-3 float-slow" style="left: 90%; top: 50%;">
+        <div class="box-text">Box 18</div>
+    </div>
 
-        <!-- CARD 08 -->
-        <div class="section" style="--x: 318px; --y: -318px; --rotate-inner: 315deg;">
-            <div class="section__content">
-                <div class="image-container">
-                    <img src="https://picsum.photos/id/80/600/400" alt="Project Image 08">
-                </div>
-                <div class="meta-row">
-                    <h4>08 // DEPLOYMENT</h4>
-                    <h3>Production Build</h3>
-                </div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- Footer Information -->
-    <footer>
-        <a href="#about">about</a>
-        <a href="#archive">archive</a>
-        <h1>scroll archive</h1>
-    </footer>
-
-    <!-- Invisible tall spacer container to enable smooth window scrolling -->
-    <div class="scroll-spacer"></div>
-
-    <!-- JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
