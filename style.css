@@ -1,37 +1,38 @@
 /* 
   =============================================================================
   DESIGN & AESTHETIC COMMENTARY (Context, Style & Usability)
-  Word Count Contribution: ~180 words
+  Word Count Target Contribution: ~180 words
   =============================================================================
-  1. CONTEXT & ARTISTIC RATIONALE:
-     This prototype references physical graphic design stock catalogs and architectural 
-     print proofing stacks (Jordanova, 2020; Comeau, 2023). By utilizing orthographic 
-     isometric projections (sharp 1.5px black outlines on pure white paper backgrounds), 
-     the digital browser window mimics a physical vector technical drawing.
+  1. CONTEXT & EDITORIAL ARTISTIC STATEMENT:
+     Inspired by high-end digital design studios (Better Off Studio, 2024; Jordanova, 2020) 
+     and kinetic typography showcases, this interface transforms a traditional image slider 
+     into an interactive fluid ribbon. The aesthetic combines deep ocean slate tones 
+     (#020813, #0a192f) with crisp cyan telemetry indicators (#00f2fe).
 
   2. USABILITY & AFFORDANCES:
-     - True Orthographic Isometric Projection: Unlike 3D perspective distortion, 
-       applying `rotateX(60deg) rotate(-45deg)` without perspective constraints keeps 
-       all parallel edges aligned, perfectly recreating the technical line-art aesthetic.
-     - Hover Peeking: Hovering over any labeled sheet translates it outward along 
-       its local 2D isometric axis (`translateY(45px)`), revealing hidden text labels.
-     - Click Extraction: Clicking a paper sheet extracts it completely from the pile 
-       (`translateY(220px)`), opening the detail panel drawer on the right.
+     - Kinetic Inertial Dragging: The track translates freely along the horizontal X-axis 
+       using spring physics, inertia decay, and mouse drag friction (`cursor: grab` / `grabbing`).
+     - 3D Interactive Card Tilt: Hovering over cards triggers real-time 3D spatial rotation 
+       (`rotateX`, `rotateY`, `scale3d`) calculated dynamically relative to mouse displacement 
+       from the card's center point.
+     - Micro-Interactions: Double-clicking a card extracts it into a full-screen blurred 
+       backdrop drawer, providing contextual inspection.
 
-  3. ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
-     - Slow In & Slow Out: Custom `cubic-bezier(0.16, 1, 0.3, 1)` easing gives each 
-       paper layer physical friction and realistic weight during slide-out interactions.
+  3. ANIMATION & PERFORMANCE PRINCIPLES (Disney's 12 Principles in UI):
+     - Slow In & Slow Out: Custom velocity decay lerps simulate realistic mass and drag friction.
+     - Staging & Depth: Backdrop blur (`backdrop-filter: blur(20px)`) isolates active modal layers.
   =============================================================================
 */
 
 :root {
-  --bg-color: #f6f6f4;
-  --paper-bg: #ffffff;
-  --ink-black: #000000;
-  --line-color: #000000;
-  --text-muted: #666666;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+  --bg-dark: #020813;
+  --card-bg: #0a192f;
+  --accent-cyan: #00f2fe;
+  --text-main: #f8fafc;
+  --text-dim: #64748b;
+  --border-light: rgba(255, 255, 255, 0.12);
   --font-mono: "Courier New", Courier, monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 * {
@@ -39,11 +40,12 @@
   margin: 0;
   padding: 0;
   user-select: none;
+  -webkit-user-select: none;
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--ink-black);
+  background-color: var(--bg-dark);
+  color: var(--text-main);
   font-family: var(--font-sans);
   height: 100vh;
   overflow: hidden;
@@ -57,170 +59,212 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 32px 40px;
+  padding: 28px 40px;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  z-index: 100;
+  align-items: center;
+  z-index: 50;
   pointer-events: none;
+  background: linear-gradient(to bottom, rgba(2, 8, 19, 0.9), rgba(2, 8, 19, 0));
+}
+
+.brand-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+  letter-spacing: 2px;
 }
 
 .brand h1 {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 900;
   letter-spacing: -0.5px;
   pointer-events: auto;
 }
 
-.subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.hud-status {
+.hud {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  font-weight: bold;
-  background: var(--paper-bg);
-  border: 1.5px solid var(--ink-black);
+  color: var(--text-dim);
+  background: rgba(10, 25, 47, 0.6);
+  border: 1px solid var(--border-light);
   padding: 6px 14px;
+  border-radius: 20px;
+  backdrop-filter: blur(8px);
   pointer-events: auto;
 }
 
-/* Viewport Area */
-.viewport {
+/* Viewport Stage */
+.gallery-viewport {
   flex: 1;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+  perspective: 1200px;
+}
+
+.gallery-viewport.is-dragging {
+  cursor: grabbing;
+}
+
+/* Horizontal Inertia Track */
+.gallery-track {
   display: flex;
   align-items: center;
-  justify-content: center;
-  position: relative;
-}
-
-/* Orthographic Isometric Stack Container */
-.stack-container {
-  position: relative;
-  width: 260px;
-  height: 360px;
-  /* Orthographic Isometric Matrix Transform */
-  transform: rotateX(60deg) rotate(-45deg);
-  transform-style: preserve-3d;
-}
-
-/* Individual Paper Sheet */
-.paper-sheet {
+  gap: 60px;
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
+  transform: translateY(-50%);
+  padding-left: 10vw;
+  will-change: transform;
+}
+
+/* 3D Kinetic Cards */
+.card {
+  width: 320px;
+  height: 480px;
+  flex-shrink: 0;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.card-inner {
   width: 100%;
   height: 100%;
-  background-color: var(--paper-bg);
-  border: 1.5px solid var(--ink-black);
-  cursor: pointer;
-  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  will-change: transform;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+  padding: 28px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Bold Typography on Labeled Sheets */
-.sheet-label {
-  font-size: 3.2rem;
-  font-weight: 900;
-  letter-spacing: -2px;
-  text-transform: uppercase;
-  line-height: 0.85;
-  color: var(--ink-black);
+.card:hover .card-inner {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 30px 60px rgba(0, 242, 254, 0.25);
+}
+
+.card-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .card-bg {
+  transform: scale(1.08);
+}
+
+.card-content {
+  position: relative;
+  z-index: 2;
   pointer-events: none;
 }
 
-/* HOVER STATE: Slides out along the lower-left isometric axis */
-.paper-sheet:hover:not(.is-extracted) {
-  transform: translateY(45px) translateZ(var(--z-offset)) !important;
-  background-color: #ffffff;
-  box-shadow: -4px 4px 0px rgba(0,0,0,0.15);
+.card-index {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+  display: block;
 }
 
-/* EXTRACTED STATE: Pulled completely out of the pile */
-.paper-sheet.is-extracted {
-  transform: translateY(220px) translateZ(calc(var(--z-offset) + 60px)) !important;
-  background-color: #ffffff;
-  border-width: 2px;
-  box-shadow: -12px 12px 25px rgba(0,0,0,0.18);
-  z-index: 999 !important;
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: 6px;
 }
 
-/* Slide-out Panel Drawer */
-.drawer {
+.card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+/* Modal Inspection Panel */
+.modal {
   position: fixed;
-  top: 0;
-  right: -420px;
-  width: 380px;
-  height: 100vh;
-  background: var(--paper-bg);
-  border-left: 2px solid var(--ink-black);
-  padding: 60px 36px;
-  z-index: 200;
+  inset: 0;
+  background: rgba(2, 8, 19, 0.88);
+  backdrop-filter: blur(20px);
+  z-index: 100;
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: right 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.drawer.is-open {
-  right: 0;
+.modal.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.modal-body {
+  max-width: 500px;
+  padding: 40px;
+  text-align: center;
+}
+
+.modal-meta {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--accent-cyan);
+  margin-bottom: 12px;
+  display: block;
+}
+
+.modal-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  margin-bottom: 16px;
+}
+
+.modal-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #cccccc;
 }
 
 .close-btn {
   position: absolute;
-  top: 24px;
-  right: 28px;
-  font-size: 1.8rem;
+  top: 32px;
+  right: 40px;
+  font-size: 2.2rem;
   background: none;
   border: none;
+  color: var(--text-main);
   cursor: pointer;
-  line-height: 1;
+  transition: color 0.2s ease;
 }
 
-.drawer-tag {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: var(--text-muted);
+.close-btn:hover {
+  color: var(--accent-cyan);
 }
 
-.drawer-title {
-  font-size: 2.4rem;
-  font-weight: 900;
-  letter-spacing: -1px;
-  margin-top: 6px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid var(--ink-black);
-  padding-bottom: 12px;
-}
-
-.drawer-description {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #333333;
-  margin-bottom: 30px;
-}
-
-.spec-table {
-  border-top: 1px solid #e0e0e0;
-}
-
-.spec-row {
+/* Footer */
+.site-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px 40px;
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 0.85rem;
-}
-
-.spec-row span {
-  color: var(--text-muted);
   font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(2, 8, 19, 0.9), rgba(2, 8, 19, 0));
 }
