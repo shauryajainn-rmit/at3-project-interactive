@@ -1,274 +1,167 @@
-/* 
-  =============================================================================
-  DESIGN & AESTHETICS COMMENTARY (Context, Style & Usability)
-  Word Count Target Contribution: ~180 words
-  =============================================================================
-  1. CONTEXT & EXACT ISOMETRIC GEOMETRY:
-     This prototype directly replicates the line-art illustration style of print 
-     proofing stacks (Jordanova, 2020; Comeau, 2023). To mirror the exact angles 
-     of the reference drawing, the main stack uses an orthographic isometric 
-     matrix (`rotateX(62deg) rotateZ(-42deg)`). 
-
-  2. SOLID STATIC BASE vs. 3D INTERACTIVE HEADERS:
-     To optimize usability and reduce visual clutter, the main body of the paper stack 
-     is constructed using solid, static CSS blocks (`.static-block`) with heavy 1.5px 
-     borders. These blocks ignore mouse interactions (`pointer-events: none`).
-
-  3. 3D CLICKABLE NAVIGATION HEADERS (`SIZE`, `FORMAT`, `STOCK`):
-     Only the three navigation sheets (`.nav-page-3d`) feature 3D transformation 
-     vectors and hover states. They are pivoted at a resting angle of `-24deg` 
-     relative to the pile, causing their corners to protrude outward exactly 
-     like the overlapping geometry in the target reference image.
-
-  4. ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
-     - Slow In & Slow Out: Custom `cubic-bezier(0.16, 1, 0.3, 1)` easing gives 
-       the sliding paper physical friction and mass during extraction.
-  =============================================================================
-*/
-
+/* =============================================================================
+   DESIGN SYSTEM & TOKENS
+   ============================================================================= */
 :root {
-  --bg-color: #f8f8f8;
-  --paper-bg: #ffffff;
-  --ink-black: #000000;
-  --text-muted: #666666;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  --font-mono: "Courier New", Courier, monospace;
+  --bg-color: #0c0c0c;
+  --panel-bg: #141414;
+  --border-color: #262626;
+  --text-main: #f0f0f0;
+  --text-muted: #888888;
+  --accent: #3b82f6;
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  user-select: none;
 }
 
 body {
   background-color: var(--bg-color);
-  color: var(--ink-black);
-  font-family: var(--font-sans);
-  height: 100vh;
-  overflow: hidden;
+  color: var(--text-main);
+  font-family: var(--font-display);
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 32px;
 }
 
-/* Header */
-.site-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 32px 40px;
+/* Header Navigation */
+header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  z-index: 100;
-  pointer-events: none;
+  align-items: center;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 24px;
+  margin-bottom: 32px;
 }
 
 .brand h1 {
   font-size: 1.1rem;
-  font-weight: 900;
+  font-weight: 800;
+  text-transform: uppercase;
   letter-spacing: -0.5px;
-  pointer-events: auto;
 }
 
-.subtitle {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.hud-status {
+.meta-tag {
   font-family: var(--font-mono);
   font-size: 0.75rem;
-  font-weight: bold;
-  background: var(--paper-bg);
-  border: 1.5px solid var(--ink-black);
-  padding: 6px 14px;
-  pointer-events: auto;
+  color: var(--text-muted);
 }
 
-/* Viewport Area */
-.viewport {
+/* Main Bento Workbench Grid */
+.workbench {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
   flex: 1;
+}
+
+@media (max-width: 900px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Control Panel Sidebar */
+.control-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  padding: 28px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  flex-direction: column;
+  gap: 24px;
 }
 
-/* Orthographic Isometric Container Projection */
-.stack-container {
-  position: relative;
-  width: 230px;
-  height: 320px;
-  transform: rotateX(62deg) rotateZ(-42deg);
-  transform-style: preserve-3d;
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-/* -----------------------------------------------------------------------------
-   STATIC SOLID STACK BASE (NON-INTERACTIVE)
-   ----------------------------------------------------------------------------- */
-.static-block {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--paper-bg);
-  border: 1.5px solid var(--ink-black);
-  pointer-events: none; /* Disables mouse interaction for solid base */
-}
-
-/* Layered static blocks to form solid, opaque paper pile depth */
-.block-bottom {
-  transform: translateZ(0px);
-  box-shadow: 
-    0px 1px 0 #000, 0px 2px 0 #000, 0px 3px 0 #000, 0px 4px 0 #000,
-    0px 5px 0 #000, 0px 6px 0 #000, 0px 7px 0 #000, 0px 8px 0 #000;
-}
-
-.block-middle-1 {
-  transform: translateZ(40px);
-  box-shadow: 
-    0px 1px 0 #000, 0px 2px 0 #000, 0px 3px 0 #000, 0px 4px 0 #000,
-    0px 5px 0 #000, 0px 6px 0 #000;
-}
-
-.block-middle-2 {
-  transform: translateZ(90px);
-  box-shadow: 
-    0px 1px 0 #000, 0px 2px 0 #000, 0px 3px 0 #000, 0px 4px 0 #000,
-    0px 5px 0 #000, 0px 6px 0 #000;
-}
-
-.block-top {
-  transform: translateZ(140px);
-  box-shadow: 
-    0px 1px 0 #000, 0px 2px 0 #000, 0px 3px 0 #000, 0px 4px 0 #000,
-    0px 5px 0 #000, 0px 6px 0 #000, 0px 7px 0 #000, 0px 8px 0 #000;
-}
-
-/* -----------------------------------------------------------------------------
-   3D CLICKABLE NAVIGATION HEADERS (SIZE, FORMAT, STOCK)
-   ----------------------------------------------------------------------------- */
-.nav-page-3d {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--paper-bg);
-  border: 1.5px solid var(--ink-black);
-  cursor: pointer;
-  pointer-events: auto;
-  will-change: transform;
-  /* Resting 3D position: elevated at --z-pos height & pivoted -24deg */
-  transform: translateZ(var(--z-pos)) rotateZ(-24deg);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
-}
-
-/* Label sitting on the protruding corner */
-.sheet-label {
-  position: absolute;
-  bottom: 12px;
-  right: 18px;
-  font-size: 2.2rem;
-  font-weight: 900;
-  letter-spacing: -1.5px;
+.control-group label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
   text-transform: uppercase;
-  color: var(--ink-black);
-  pointer-events: none;
 }
 
-/* HOVER PEEK: Slides outward along rotated vector */
-.nav-page-3d:hover:not(.is-extracted) {
-  transform: translateZ(var(--z-pos)) rotateZ(-24deg) translate(22px, 32px) !important;
-  background-color: #ffffff;
-  box-shadow: -4px 4px 0px rgba(0, 0, 0, 0.15);
+.control-group input[type="range"] {
+  width: 100%;
+  accent-color: var(--accent);
+  cursor: pointer;
 }
 
-/* EXTRACTED STATE: Pulled completely out of the solid stack */
-.nav-page-3d.is-extracted {
-  transform: translateZ(calc(var(--z-pos) + 90px)) rotateZ(-24deg) translate(130px, 170px) !important;
-  background-color: #ffffff;
-  border-width: 2px;
-  box-shadow: -12px 12px 25px rgba(0, 0, 0, 0.18);
-  z-index: 999 !important;
+.value-display {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-main);
 }
 
-/* -----------------------------------------------------------------------------
-   DETAIL DRAWER PANEL
-   ----------------------------------------------------------------------------- */
-.drawer {
-  position: fixed;
-  top: 0;
-  right: -420px;
-  width: 380px;
-  height: 100vh;
-  background: var(--paper-bg);
-  border-left: 2px solid var(--ink-black);
-  padding: 60px 36px;
-  z-index: 200;
+/* Interactive Display Stage */
+.stage {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  padding: 48px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: right 0.45s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+  position: relative;
+  overflow: hidden;
 }
 
-.drawer.is-open {
-  right: 0;
+.editable-canvas {
+  font-size: var(--dynamic-size, 3rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  outline: none;
+  word-break: break-word;
+  transition: font-size 0.1s ease;
 }
 
-.close-btn {
-  position: absolute;
-  top: 24px;
-  right: 28px;
-  font-size: 1.8rem;
-  background: none;
-  border: none;
+.editable-canvas:focus {
+  color: var(--accent);
+}
+
+/* Cards Matrix Footer */
+.matrix-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 768px) {
+  .matrix-footer {
+    grid-template-columns: 1fr;
+  }
+}
+
+.matrix-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  padding: 24px;
   cursor: pointer;
-  line-height: 1;
+  transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
-.drawer-tag {
+.matrix-card:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.matrix-card h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.matrix-card p {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
-}
-
-.drawer-title {
-  font-size: 2.4rem;
-  font-weight: 900;
-  letter-spacing: -1px;
-  margin-top: 6px;
-  margin-bottom: 18px;
-  border-bottom: 2px solid var(--ink-black);
-  padding-bottom: 12px;
-}
-
-.drawer-description {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #333333;
-  margin-bottom: 30px;
-}
-
-.spec-table {
-  border-top: 1px solid #e0e0e0;
-}
-
-.spec-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: 0.85rem;
-}
-
-.spec-row span {
-  color: var(--text-muted);
-  font-family: var(--font-mono);
+  line-height: 1.5;
 }

@@ -1,78 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Size / Format / Stock - Solid Stack Navigation</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scroll Carousel Archive</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top Header -->
-  <header class="site-header">
-    <div class="brand">
-      <h1>SIZE / FORMAT / STOCK</h1>
-      <p class="subtitle">Interactive Print Proofing Stack</p>
-    </div>
-    <div class="hud-status" id="hudStatus">STATUS: STACK IDLE</div>
-  </header>
+    <!-- Static Header -->
+    <header>
+        <h3 class="brand-title">Scroll Archive // 01</h3>
+        <div class="scroll-instruction">[ SCROLL TO ROTATE STAGE ]</div>
+    </header>
 
-  <!-- Central Isometric Viewport Stage -->
-  <main class="viewport">
-    <div class="stack-container" id="stackContainer">
-      
-      <!-- Static Solid Paper Block Layers (Non-interactive Base) -->
-      <div class="static-block block-bottom"></div>
-      <div class="static-block block-middle-1"></div>
-      <div class="static-block block-middle-2"></div>
-      <div class="static-block block-top"></div>
-
-      <!-- ONLY THE 3 CLICKABLE NAVIGATION HEADERS ARE 3D & INTERACTIVE -->
-      <!-- STOCK LAYER -->
-      <div class="nav-page-3d" data-label="STOCK" style="--z-pos: 35px;">
-        <span class="sheet-label">STOCK</span>
-      </div>
-
-      <!-- FORMAT LAYER -->
-      <div class="nav-page-3d" data-label="FORMAT" style="--z-pos: 85px;">
-        <span class="sheet-label">FORMAT</span>
-      </div>
-
-      <!-- SIZE LAYER -->
-      <div class="nav-page-3d" data-label="SIZE" style="--z-pos: 135px;">
-        <span class="sheet-label">SIZE</span>
-      </div>
-
-    </div>
-  </main>
-
-  <!-- Slide-Out Section Drawer (Triggered on Click) -->
-  <aside class="drawer" id="drawer">
-    <button class="close-btn" id="closeBtn" aria-label="Close panel">&times;</button>
-    <div class="drawer-content">
-      <span class="drawer-tag" id="drawerTag">SECTION // 01</span>
-      <h2 class="drawer-title" id="drawerTitle">SIZE</h2>
-      <p class="drawer-description" id="drawerDesc">
-        Standardized ISO paper dimensions and aspect ratios. Select individual stock sheets to inspect physical weight, surface grain, and trim specifications.
-      </p>
-      
-      <div class="spec-table">
-        <div class="spec-row">
-          <span>DIMENSIONS</span>
-          <strong id="specDim">210 × 297 mm</strong>
+    <!-- Main Rotating Stage (Driven by Scroll) -->
+    <main id="carouselStage">
+        
+        <!-- CARD 01 -->
+        <div class="section" style="--x: 450px; --y: 0px; --rotate-inner: 0deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <!-- Replace src with your own image paths -->
+                    <img src="https://picsum.photos/id/10/600/400" alt="Project Image 01">
+                </div>
+                <div class="meta-row">
+                    <h4>01 // FOUNDATION</h4>
+                    <h3>Visual Studies</h3>
+                </div>
+            </div>
         </div>
-        <div class="spec-row">
-          <span>WEIGHT</span>
-          <strong id="specWeight">120 GSM Uncoated</strong>
-        </div>
-        <div class="spec-row">
-          <span>FINISH</span>
-          <strong id="specFinish">Smooth Matte Cotton</strong>
-        </div>
-      </div>
-    </div>
-  </aside>
 
+        <!-- CARD 02 -->
+        <div class="section" style="--x: 318px; --y: 318px; --rotate-inner: 45deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/20/600/400" alt="Project Image 02">
+                </div>
+                <div class="meta-row">
+                    <h4>02 // TYPOGRAPHY</h4>
+                    <h3>Variable Forms</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 03 -->
+        <div class="section" style="--x: 0px; --y: 450px; --rotate-inner: 90deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/30/600/400" alt="Project Image 03">
+                </div>
+                <div class="meta-row">
+                    <h4>03 // SPATIAL GRID</h4>
+                    <h3>Kinetic Layouts</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 04 -->
+        <div class="section" style="--x: -318px; --y: 318px; --rotate-inner: 135deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/40/600/400" alt="Project Image 04">
+                </div>
+                <div class="meta-row">
+                    <h4>04 // EXECUTION</h4>
+                    <h3>State Transitions</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 05 -->
+        <div class="section" style="--x: -450px; --y: 0px; --rotate-inner: 180deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/50/600/400" alt="Project Image 05">
+                </div>
+                <div class="meta-row">
+                    <h4>05 // INTERACTION</h4>
+                    <h3>Telemetry & Feedback</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 06 -->
+        <div class="section" style="--x: -318px; --y: -318px; --rotate-inner: 225deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/60/600/400" alt="Project Image 06">
+                </div>
+                <div class="meta-row">
+                    <h4>06 // ARCHITECTURE</h4>
+                    <h3>Modular Systems</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 07 -->
+        <div class="section" style="--x: 0px; --y: -450px; --rotate-inner: 270deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/70/600/400" alt="Project Image 07">
+                </div>
+                <div class="meta-row">
+                    <h4>07 // OPTIMIZATION</h4>
+                    <h3>Performance Tuning</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARD 08 -->
+        <div class="section" style="--x: 318px; --y: -318px; --rotate-inner: 315deg;">
+            <div class="section__content">
+                <div class="image-container">
+                    <img src="https://picsum.photos/id/80/600/400" alt="Project Image 08">
+                </div>
+                <div class="meta-row">
+                    <h4>08 // DEPLOYMENT</h4>
+                    <h3>Production Build</h3>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer Information -->
+    <footer>
+        <a href="#about">about</a>
+        <a href="#archive">archive</a>
+        <h1>scroll archive</h1>
+    </footer>
+
+    <!-- Invisible tall spacer container to enable smooth window scrolling -->
+    <div class="scroll-spacer"></div>
+
+    <!-- JavaScript -->
+    <script src="script.js"></script>
 </body>
 </html>
