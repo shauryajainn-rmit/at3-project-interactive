@@ -1,0 +1,200 @@
+:root {
+  --bg-color: #0a0a0a;
+  --text-main: #f1f1f1;
+  --text-muted: #777777;
+  --accent-hover: #ffffff;
+  --line-color: rgba(255, 255, 255, 0.12);
+  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-stack);
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 24px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0));
+}
+
+.author-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  pointer-events: auto;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.author-name:hover {
+  opacity: 0.6;
+}
+
+.info-toggle {
+  pointer-events: auto;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-main);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.info-toggle:hover {
+  border-color: var(--accent-hover);
+  background: var(--accent-hover);
+  color: var(--bg-color);
+}
+
+.sprite-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 220px;
+  height: 220px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+#spriteCanvas {
+  width: 100%;
+  height: 100%;
+}
+
+.wrapper-menu {
+  width: 100%;
+  height: 100vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  position: relative;
+  z-index: 2;
+}
+
+.wrapper-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-content-inner {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 120px 20px;
+}
+
+.list-menu {
+  list-style: none;
+}
+
+.menu-item {
+  display: flex;
+  align-items: baseline;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line-color);
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-main);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.menu-item:hover {
+  transform: translateX(12px);
+  color: var(--accent-hover);
+}
+
+.nb-menu {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  width: 80px;
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+.title-menu {
+  font-size: 1.35rem;
+  font-weight: 400;
+  letter-spacing: -0.2px;
+}
+
+.author-content-panel {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  max-width: 480px;
+  height: 100vh;
+  background: rgba(15, 15, 15, 0.96);
+  border-left: 1px solid var(--line-color);
+  backdrop-filter: blur(15px);
+  z-index: 30;
+  padding: 100px 40px 40px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.author-content-panel.open {
+  right: 0;
+}
+
+.btn-close {
+  position: absolute;
+  top: 28px;
+  right: 32px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+
+.btn-close:hover {
+  color: var(--text-main);
+}
+
+.poem-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #cccccc;
+  font-style: italic;
+  margin-bottom: 2rem;
+}
+
+.contact-details {
+  font-size: 0.85rem;
+  line-height: 1.8;
+  color: var(--text-muted);
+  border-top: 1px solid var(--line-color);
+  padding-top: 20px;
+}
+
+.contact-details a {
+  color: var(--text-main);
+  text-decoration: none;
+}
