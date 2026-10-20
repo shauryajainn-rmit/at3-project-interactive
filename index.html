@@ -3,90 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Natalia Jordanova - Interactive Prototype</title>
+  <title>Isometric Paper Stack Navigation</title>
   <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
 
+  <!-- Header -->
   <header>
-    <div class="author-name" id="logoTitle">Natalia Jordanova</div>
-    <button class="info-toggle" id="infoToggle">Info / CV</button>
+    <div>
+      <div class="brand-title">Size / Format / Stock</div>
+      <div class="brand-subtitle">Interactive Paper Archive Prototype</div>
+    </div>
+    <div class="status-hud" id="statusHud">Stack Mode: Active</div>
   </header>
 
-  <div class="sprite-container">
-    <canvas id="spriteCanvas" width="220" height="220"></canvas>
-  </div>
-
-  <div class="wrapper-menu" id="wrapperMenu">
-    <div class="menu-content-inner" id="menuInner">
-      
-      <div class="container_menu" id="menufirst">
-        <ul class="list_menu">
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Cold Sweat</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Console</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Key</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Unfair Temporary Museum</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Flat Bubbles</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">SOFT, HARD, WET [PDF]</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Simultaneous Truths</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Club Substance</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Museum of Non-Human Ethics after The Fifth Law</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">PEBKAC</p></li>
-        </ul>
-      </div>
-
-      <div class="container_menu menutocopy">
-        <ul class="list_menu">
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Cold Sweat</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Console</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Key</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Unfair Temporary Museum</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Flat Bubbles</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">SOFT, HARD, WET [PDF]</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Simultaneous Truths</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Club Substance</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Museum of Non-Human Ethics after The Fifth Law</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">PEBKAC</p></li>
-        </ul>
-      </div>
-
-      <div class="container_menu" id="menulast">
-        <ul class="list_menu">
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Cold Sweat</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Console</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">The Key</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Unfair Temporary Museum</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Flat Bubbles</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">SOFT, HARD, WET [PDF]</p></li>
-          <li class="menu-item"><span class="nb-menu">2020</span><p class="title-menu">Simultaneous Truths</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Club Substance</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">Museum of Non-Human Ethics after The Fifth Law</p></li>
-          <li class="menu-item"><span class="nb-menu">2019</span><p class="title-menu">PEBKAC</p></li>
-        </ul>
-      </div>
-
+  <!-- Viewport Stage -->
+  <main class="viewport-stage">
+    <div class="stack-container" id="stackContainer">
+      <!-- Generated Sheets will be inserted here dynamically -->
     </div>
-  </div>
+  </main>
 
-  <aside class="author-content-panel" id="infoPanel">
-    <span class="btn-close" id="btnClose">&times;</span>
-    <div class="poem-text">
-      I'm always aligning the directions of the world<br>
-      with the walls of the room I'm situated in.<br>
-      immune to insignificant questions because of the ultimate defense<br>
-      Orientation catastrophes inside time paradoxes.<br>
-      world made out of words, hyperlinked to other worlds.<br><br>
-      A causal loop is technically time travel:<br>
-      moving your path forward,<br>
-      towards striking your past self.
+  <!-- Detail Content Panel -->
+  <aside class="detail-panel" id="detailPanel">
+    <div>
+      <div class="panel-header">
+        <div class="panel-tag" id="panelTag">SECTION // 01</div>
+        <h2 class="panel-title" id="panelTitle">FORMAT</h2>
+      </div>
+      <p class="panel-body" id="panelBody">
+        Select a paper sheet from the isometric stack to extract its spec sheet. 
+        Each layer represents physical print stock variables including dimensions, 
+        weight ratio, surface texture, and binding mechanisms.
+      </p>
     </div>
-    <div class="contact-details">
-      Natalia Jordanova<br>
-      <a href="mailto:nataliqiordanova@gmail.com">nataliqiordanova@gmail.com</a><br>
-      +31 (0) 633871024
-    </div>
+    <button class="close-btn" id="closeBtn">Return Sheet to Stack</button>
   </aside>
 
-  <script src="script.js"></script>
 </body>
 </html>

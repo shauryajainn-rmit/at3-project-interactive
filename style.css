@@ -1,200 +1,235 @@
+/* 
+  =============================================================================
+  1. DESIGN & AESTHETICS COMMENTARY (Context, Style & Usability)
+  Target Commentary Contribution: ~170 words
+  =============================================================================
+  CONTEXT & EDITORIAL ARTISTIC STATEMENT:
+  Inspired by physical print proofing stacks and brutalist archive typography 
+  (Jordanova, 2020)[cite: 1, 2], this interface converts standard web navigation into a 
+  tactile, 3D paper stack. The architectural black-and-white aesthetic (#ffffff 
+  sheets with crisp 2px #000000 borders) references tactile stock catalogs and 
+  print production workflows.
+
+  USABILITY & AFFORDANCES:
+  - 3D Depth Affordances: Sheets are rendered in true 3D spatial perspective 
+    using CSS `preserve-3d` and matrix rotation (rotateX: 58deg, rotateZ: -38deg).
+  - Hover Peek State: Hovering over any layer slides the sheet smoothly outward 
+    along its isometric axis (-35px X/Y offset), providing clear feedback and 
+    exposing the label text.
+  - Extraction State: Clicking a sheet pulls it completely out of the stack 
+    (-280px axis slide) and shifts context to reveal the section details panel.
+
+  ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
+  - Slow In & Slow Out: Custom cubic-bezier curves (0.16, 1, 0.3, 1) simulate 
+    natural friction and paper mass during slide out and return transitions[cite: 1].
+  =============================================================================
+*/
+
 :root {
-  --bg-color: #0a0a0a;
-  --text-main: #f1f1f1;
-  --text-muted: #777777;
-  --accent-hover: #ffffff;
-  --line-color: rgba(255, 255, 255, 0.12);
-  --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bg-color: #f2f2f0;
+  --paper-bg: #ffffff;
+  --ink-black: #050505;
+  --line-color: #000000;
+  --accent-gray: #e2e2df;
+  --font-mono: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  user-select: none;
 }
 
 body {
   background-color: var(--bg-color);
-  color: var(--text-main);
-  font-family: var(--font-stack);
-  height: 100vh;
+  color: var(--ink-black);
+  font-family: var(--font-mono);
+  min-height: 100vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
+/* Top Navigation Header */
 header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 24px 32px;
+  padding: 28px 40px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  z-index: 20;
+  align-items: flex-start;
+  z-index: 100;
   pointer-events: none;
-  background: linear-gradient(to bottom, rgba(10,10,10,0.95), rgba(10,10,10,0));
 }
 
-.author-name {
-  font-size: 1.1rem;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  pointer-events: auto;
+.brand-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
   text-transform: uppercase;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.author-name:hover {
-  opacity: 0.6;
-}
-
-.info-toggle {
   pointer-events: auto;
-  background: transparent;
-  border: 1px solid var(--text-muted);
-  color: var(--text-main);
-  padding: 6px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
 }
 
-.info-toggle:hover {
-  border-color: var(--accent-hover);
-  background: var(--accent-hover);
-  color: var(--bg-color);
+.brand-subtitle {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
 }
 
-.sprite-container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 220px;
-  height: 220px;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.85;
-}
-
-#spriteCanvas {
-  width: 100%;
-  height: 100%;
-}
-
-.wrapper-menu {
-  width: 100%;
-  height: 100vh;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  position: relative;
-  z-index: 2;
-}
-
-.wrapper-menu::-webkit-scrollbar {
-  display: none;
-}
-
-.menu-content-inner {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 120px 20px;
-}
-
-.list-menu {
-  list-style: none;
-}
-
-.menu-item {
-  display: flex;
-  align-items: baseline;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--line-color);
-  cursor: pointer;
-  text-decoration: none;
-  color: var(--text-main);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
-}
-
-.menu-item:hover {
-  transform: translateX(12px);
-  color: var(--accent-hover);
-}
-
-.nb-menu {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  width: 80px;
+.status-hud {
+  font-size: 0.8rem;
   font-family: monospace;
-  flex-shrink: 0;
+  text-transform: uppercase;
+  background: #fff;
+  padding: 6px 14px;
+  border: 1.5px solid var(--ink-black);
+  pointer-events: auto;
 }
 
-.title-menu {
-  font-size: 1.35rem;
-  font-weight: 400;
-  letter-spacing: -0.2px;
+/* Main Spatial Viewport Stage */
+.viewport-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1400px;
+  perspective-origin: 50% 30%;
 }
 
-.author-content-panel {
+/* 3D Isometric Stack Container */
+.stack-container {
+  position: relative;
+  width: 320px;
+  height: 440px;
+  transform-style: preserve-3d;
+  transform: rotateX(58deg) rotateZ(-38deg) translateZ(0px);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Individual Paper Sheet Layers */
+.paper-sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--paper-bg);
+  border: 2px solid var(--line-color);
+  box-shadow: -1px 1px 0px rgba(0,0,0,0.8), -3px 3px 0px rgba(0,0,0,0.15);
+  cursor: pointer;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  will-change: transform;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
+}
+
+/* Paper Edge Stack Filler Lines (Creates thick pile illusion) */
+.paper-sheet::before {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: -2px;
+  right: -2px;
+  height: 4px;
+  background: var(--paper-bg);
+  border: 1.5px solid var(--line-color);
+  border-top: none;
+}
+
+/* Bold Typography Label on Sheet */
+.sheet-label {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  text-transform: uppercase;
+  line-height: 0.9;
+  pointer-events: none;
+}
+
+.sheet-number {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-size: 0.85rem;
+  font-family: monospace;
+  font-weight: bold;
+}
+
+/* HOVER STATE: Smooth Slide Out Along Isometric Plane */
+.paper-sheet:hover:not(.is-extracted) {
+  transform: translate3d(-35px, -35px, 15px) !important;
+  background-color: #ffffff;
+  box-shadow: -4px 4px 0px #000, -10px 10px 20px rgba(0,0,0,0.15);
+}
+
+/* EXTRACTED STATE: Pulled Out of Pile */
+.paper-sheet.is-extracted {
+  transform: translate3d(-260px, -260px, 80px) !important;
+  background-color: #ffffff;
+  border-color: var(--line-color);
+  box-shadow: -8px 8px 0px #000, -20px 20px 40px rgba(0,0,0,0.2);
+  z-index: 500 !important;
+}
+
+/* Detail Drawer Panel (Revealed upon selection) */
+.detail-panel {
   position: fixed;
+  right: -480px;
   top: 0;
-  right: -100%;
-  width: 100%;
-  max-width: 480px;
+  width: 440px;
   height: 100vh;
-  background: rgba(15, 15, 15, 0.96);
-  border-left: 1px solid var(--line-color);
-  backdrop-filter: blur(15px);
-  z-index: 30;
-  padding: 100px 40px 40px 40px;
+  background: #ffffff;
+  border-left: 2px solid var(--line-color);
+  z-index: 200;
+  padding: 60px 40px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow-y: auto;
+  transition: right 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: -10px 0 30px rgba(0,0,0,0.08);
 }
 
-.author-content-panel.open {
+.detail-panel.is-open {
   right: 0;
 }
 
-.btn-close {
-  position: absolute;
-  top: 28px;
-  right: 32px;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: var(--text-muted);
-  transition: color 0.2s ease;
+.panel-header {
+  border-bottom: 2px solid var(--line-color);
+  padding-bottom: 20px;
 }
 
-.btn-close:hover {
-  color: var(--text-main);
+.panel-tag {
+  font-family: monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: #666;
 }
 
-.poem-text {
+.panel-title {
+  font-size: 2.2rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+.panel-body {
   font-size: 0.95rem;
-  line-height: 1.8;
-  color: #cccccc;
-  font-style: italic;
-  margin-bottom: 2rem;
+  line-height: 1.7;
+  color: #333;
+  margin-block: 20px;
 }
 
-.contact-details {
-  font-size: 0.85rem;
-  line-height: 1.8;
-  color: var(--text-muted);
-  border-top: 1px solid var(--line-color);
-  padding-top: 20px;
+.close-btn {
+  background: var(--ink-black);
+  color: #fff;
+  border: none;
+  padding: 14px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.2s ease;
 }
 
-.contact-details a {
-  color: var(--text-main);
-  text-decoration: none;
+.close-btn:hover {
+  background: #333;
 }
