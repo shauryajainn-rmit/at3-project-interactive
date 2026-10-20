@@ -3,105 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SURF // Kinetic Gallery Archive</title>
+  <title>Size / Format / Stock - Solid Stack Navigation</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
 </head>
 <body>
 
-  <!-- Editorial Top Header -->
+  <!-- Top Header -->
   <header class="site-header">
     <div class="brand">
-      <span class="brand-tag">VOLUME 04</span>
-      <h1>SURF ARCHIVE</h1>
+      <h1>SIZE / FORMAT / STOCK</h1>
+      <p class="subtitle">Interactive Print Proofing Stack</p>
     </div>
-    <div class="hud" id="hud">DRAG TO EXPLORE [ 0.00 PX/S ]</div>
+    <div class="hud-status" id="hudStatus">STATUS: STACK IDLE</div>
   </header>
 
-  <!-- Main Horizontal Canvas Stage -->
-  <main class="gallery-viewport" id="viewport">
-    <div class="gallery-track" id="track">
+  <!-- Central Isometric Viewport Stage -->
+  <main class="viewport">
+    <div class="stack-container" id="stackContainer">
       
-      <!-- Card 01 -->
-      <article class="card" data-title="SWELL LINEAGE" data-num="01" data-meta="PACIFIC OCEAN / 18°N">
-        <div class="card-inner">
-          <div class="card-bg" style="background-image: linear-gradient(135deg, #0a192f, #112240);"></div>
-          <div class="card-content">
-            <span class="card-index">01</span>
-            <h2 class="card-title">SWELL LINEAGE</h2>
-            <p class="card-subtitle">Hydraulic velocity &amp; wave period mapping</p>
-          </div>
-        </div>
-      </article>
+      <!-- Static Solid Paper Block Layers (Non-interactive) -->
+      <div class="static-block block-bottom"></div>
+      <div class="static-block block-middle-1"></div>
+      <div class="static-block block-middle-2"></div>
+      <div class="static-block block-top"></div>
 
-      <!-- Card 02 -->
-      <article class="card" data-title="THERMAL CURRENTS" data-num="02" data-meta="ATLANTIC BASIN / 34°W">
-        <div class="card-inner">
-          <div class="card-bg" style="background-image: linear-gradient(135deg, #1b2a4a, #0d1b2a);"></div>
-          <div class="card-content">
-            <span class="card-index">02</span>
-            <h2 class="card-title">THERMAL CURRENTS</h2>
-            <p class="card-subtitle">Deep atmospheric pressure gradients</p>
-          </div>
-        </div>
-      </article>
+      <!-- ONLY THE 3 CLICKABLE NAVIGATION HEADERS ARE 3D & INTERACTIVE -->
+      <div class="nav-page-3d" data-label="STOCK" style="--z-pos: 35px;">
+        <span class="sheet-label">STOCK</span>
+      </div>
 
-      <!-- Card 03 -->
-      <article class="card" data-title="BATHYMETRY" data-num="03" data-meta="CORAL SEA / 12°S">
-        <div class="card-inner">
-          <div class="card-bg" style="background-image: linear-gradient(135deg, #1f3160, #0a1128);"></div>
-          <div class="card-content">
-            <span class="card-index">03</span>
-            <h2 class="card-title">BATHYMETRY</h2>
-            <p class="card-subtitle">Submarine topography and reef refraction</p>
-          </div>
-        </div>
-      </article>
+      <div class="nav-page-3d" data-label="FORMAT" style="--z-pos: 85px;">
+        <span class="sheet-label">FORMAT</span>
+      </div>
 
-      <!-- Card 04 -->
-      <article class="card" data-title="KINETIC DRIFT" data-num="04" data-meta="SOUTHERN OCEAN / 52°S">
-        <div class="card-inner">
-          <div class="card-bg" style="background-image: linear-gradient(135deg, #0f2b46, #1a1a24);"></div>
-          <div class="card-content">
-            <span class="card-index">04</span>
-            <h2 class="card-title">KINETIC DRIFT</h2>
-            <p class="card-subtitle">Surface wind stress &amp; energy dissipation</p>
-          </div>
-        </div>
-      </article>
-
-      <!-- Card 05 -->
-      <article class="card" data-title="ISOBAR DRIFT" data-num="05" data-meta="INDIAN OCEAN / 22°S">
-        <div class="card-inner">
-          <div class="card-bg" style="background-image: linear-gradient(135deg, #132a13, #02111b);"></div>
-          <div class="card-content">
-            <span class="card-index">05</span>
-            <h2 class="card-title">ISOBAR DRIFT</h2>
-            <p class="card-subtitle">Cyclonic swell generation patterns</p>
-          </div>
-        </div>
-      </article>
+      <div class="nav-page-3d" data-label="SIZE" style="--z-pos: 135px;">
+        <span class="sheet-label">SIZE</span>
+      </div>
 
     </div>
   </main>
 
-  <!-- Expanded Detail Modal -->
-  <aside class="modal" id="modal">
-    <button class="close-btn" id="closeBtn" aria-label="Close modal">&times;</button>
-    <div class="modal-body">
-      <span class="modal-meta" id="modalMeta">PACIFIC OCEAN / 18°N</span>
-      <h2 class="modal-title" id="modalTitle">SWELL LINEAGE</h2>
-      <p class="modal-desc">
-        A study in momentum transfer across vast marine basins. As atmospheric wind fields generate surface disturbance, kinetic energy condenses into organized swell trains across thousands of kilometers.
+  <!-- Slide-Out Section Drawer (Triggered on Click) -->
+  <aside class="drawer" id="drawer">
+    <button class="close-btn" id="closeBtn" aria-label="Close panel">&times;</button>
+    <div class="drawer-content">
+      <span class="drawer-tag" id="drawerTag">SECTION // 01</span>
+      <h2 class="drawer-title" id="drawerTitle">SIZE</h2>
+      <p class="drawer-description" id="drawerDesc">
+        Standardized ISO paper dimensions and aspect ratios. Select individual stock sheets to inspect physical weight, surface grain, and trim specifications.
       </p>
+      
+      <div class="spec-table">
+        <div class="spec-row">
+          <span>DIMENSIONS</span>
+          <strong id="specDim">210 × 297 mm</strong>
+        </div>
+        <div class="spec-row">
+          <span>WEIGHT</span>
+          <strong id="specWeight">120 GSM Uncoated</strong>
+        </div>
+        <div class="spec-row">
+          <span>FINISH</span>
+          <strong id="specFinish">Smooth Matte Cotton</strong>
+        </div>
+      </div>
     </div>
   </aside>
-
-  <!-- Footer Navigation Prompt -->
-  <footer class="site-footer">
-    <span>HOLD &amp; DRAG TO PAN</span>
-    <span>DOUBLE CLICK CARD TO INSPECT</span>
-  </footer>
 
 </body>
 </html>

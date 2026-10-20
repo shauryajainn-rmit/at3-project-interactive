@@ -1,139 +1,95 @@
 /*
   =============================================================================
-  JAVASCRIPT & PHYSICS KINETIC ENGINE COMMENTARY
-  Word Count Target Contribution: ~270 words
+  JAVASCRIPT CONTROLLER
   =============================================================================
-  1. MOMENTUM INERTIA DRAG ALGORITHM:
-     To recreate the tactile momentum dragging found on studio websites (Better Off Studio, 2024), 
-     this engine tracks delta movement during active drag (`pointermove`). On release, velocity 
-     is calculated (`velocityX = currentX - lastX`) and continuously multiplied by a friction 
-     coefficient (`0.92`) inside a `requestAnimationFrame` loop until momentum naturally decays to zero.
-
-  2. 3D PROXIMITY CARD TILT MECHANICS:
-     Each card monitors cursor position relative to its visual center coordinates. Displacement 
-     ratios calculate 3D rotation angles:
-     `rotateY = (mouseX - cardCenterX) * 0.08 deg`
-     `rotateX = -(mouseY - cardCenterY) * 0.08 deg`
-     This produces continuous spatial perspective depth without relying on external WebGL libraries.
-
-  3. BOUNDARY CLAMPING & RESPONSIVENESS:
-     Track displacement (`currentTranslateX`) is clamped between strict minimum (`-maxScroll`) 
-     and maximum (`0px`) spatial bounds to prevent infinite dragging off-screen.
+  Only monitors events for the three `.nav-page-3d` header elements.
   =============================================================================
 */
 
 document.addEventListener('DOMContentLoaded', () => {
-  const viewport = document.getElementById('viewport');
-  const track = document.getElementById('track');
-  const cards = document.querySelectorAll('.card');
-  const hud = document.getElementById('hud');
-  const modal = document.getElementById('modal');
+  const navPages = document.querySelectorAll('.nav-page-3d');
+  const drawer = document.getElementById('drawer');
   const closeBtn = document.getElementById('closeBtn');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalMeta = document.getElementById('modalMeta');
+  const hudStatus = document.getElementById('hudStatus');
+  const drawerTag = document.getElementById('drawerTag');
+  const drawerTitle = document.getElementById('drawerTitle');
+  const drawerDesc = document.getElementById('drawerDesc');
+  const specDim = document.getElementById('specDim');
+  const specWeight = document.getElementById('specWeight');
+  const specFinish = document.getElementById('specFinish');
 
-  // Drag Physics State
-  let isDragging = false;
-  let startX = 0;
-  let currentTranslateX = 0;
-  let prevTranslateX = 0;
-  let velocityX = 0;
-  let animationFrameId = null;
-
-  // Calculate Maximum Left Scroll Boundary
-  function getMaxScroll() {
-    return -(track.scrollWidth - window.innerWidth + window.innerWidth * 0.1);
-  }
-
-  // Continuous Physics Loop
-  function updatePhysics() {
-    if (!isDragging) {
-      // Apply momentum decay friction
-      velocityX *= 0.92;
-      currentTranslateX += velocityX;
-
-      // Clamp within track boundaries
-      const maxScroll = getMaxScroll();
-      if (currentTranslateX > 0) {
-        currentTranslateX = 0;
-        velocityX = 0;
-      } else if (currentTranslateX < maxScroll) {
-        currentTranslateX = maxScroll;
-        velocityX = 0;
-      }
+  // Labeled Sections Data
+  const sectionsData = {
+    'SIZE': {
+      tag: 'SECTION // 01',
+      desc: 'Standardized ISO 216 paper dimensions ranging from A0 to A8 formats. Maintains exact 1:√2 aspect proportions across all print cuts.',
+      dim: '210 × 297 mm (A4)',
+      weight: '120 GSM',
+      finish: 'Uncoated Cotton Rag'
+    },
+    'FORMAT': {
+      tag: 'SECTION // 02',
+      desc: 'Page folding signatures, grid templates, and publication imposition configurations designed for editorial layout systems.',
+      dim: '16-Page Signature',
+      weight: '150 GSM',
+      finish: 'Satin Matte Coated'
+    },
+    'STOCK': {
+      tag: 'SECTION // 03',
+      desc: 'Physical paper fiber composition, grain direction, and tactile surface opacity specs evaluated for print ink absorption.',
+      dim: 'Bulk Density 1.3',
+      weight: '300 GSM',
+      finish: 'Textured Recycled Board'
     }
+  };
 
-    // Apply Hardware Accelerated Transformation
-    track.style.transform = `translate3d(${currentTranslateX}px, -50%, 0)`;
+  let activePage = null;
 
-    // Update HUD Velocity Readout
-    hud.innerText = `DRAG TO EXPLORE [ ${Math.abs(velocityX).toFixed(2)} PX/S ]`;
+  // Bind Listeners strictly to the 3D Navigation Headers
+  navPages.forEach((page) => {
+    page.addEventListener('click', () => {
+      const label = page.dataset.label;
 
-    animationFrameId = requestAnimationFrame(updatePhysics);
+      // Toggle off if already extracted
+      if (page.classList.contains('is-extracted')) {
+        resetStack();
+        return;
+      }
+
+      resetStack();
+
+      // Extract clicked 3D header page
+      activePage = page;
+      page.classList.add('is-extracted');
+
+      // Populate detail drawer
+      if (sectionsData[label]) {
+        const data = sectionsData[label];
+        drawerTag.innerText = data.tag;
+        drawerTitle.innerText = label;
+        drawerDesc.innerText = data.desc;
+        specDim.innerText = data.dim;
+        specWeight.innerText = data.weight;
+        specFinish.innerText = data.finish;
+      }
+
+      drawer.classList.add('is-open');
+      hudStatus.innerText = `STATUS: EXTRACTED (${label})`;
+    });
+  });
+
+  function resetStack() {
+    if (activePage) {
+      activePage.classList.remove('is-extracted');
+      activePage = null;
+    }
+    drawer.classList.remove('is-open');
+    hudStatus.innerText = 'STATUS: STACK IDLE';
   }
 
-  // Pointer Drag Event Handlers
-  viewport.addEventListener('pointerdown', (e) => {
-    isDragging = true;
-    viewport.classList.add('is-dragging');
-    startX = e.clientX;
-    prevTranslateX = currentTranslateX;
-    velocityX = 0;
-  });
-
-  window.addEventListener('pointermove', (e) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - startX;
-    const nextTranslate = prevTranslateX + deltaX;
-
-    // Calculate instant velocity
-    velocityX = nextTranslate - currentTranslateX;
-    currentTranslateX = nextTranslate;
-  });
-
-  window.addEventListener('pointerup', () => {
-    if (!isDragging) return;
-    isDragging = false;
-    viewport.classList.remove('is-dragging');
-  });
-
-  // 3D Card Hover Tilt Mechanics
-  cards.forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const cardCenterX = rect.left + rect.width / 2;
-      const cardCenterY = rect.top + rect.height / 2;
-
-      const deltaX = e.clientX - cardCenterX;
-      const deltaY = e.clientY - cardCenterY;
-
-      const rotateY = deltaX * 0.08;
-      const rotateX = -deltaY * 0.08;
-
-      card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.04, 1.04, 1.04)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-    });
-
-    // Double Click to Open Detail Modal
-    card.addEventListener('dblclick', () => {
-      modalTitle.innerText = card.dataset.title;
-      modalMeta.innerText = card.dataset.meta;
-      modal.classList.add('is-open');
-    });
-  });
-
-  // Modal Controls
-  closeBtn.addEventListener('click', () => {
-    modal.classList.remove('is-open');
-  });
+  closeBtn.addEventListener('click', resetStack);
 
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') modal.classList.remove('is-open');
+    if (e.key === 'Escape') resetStack();
   });
-
-  // Start Animation Loop
-  updatePhysics();
 });
