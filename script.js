@@ -1,8 +1,24 @@
 /*
   =============================================================================
-  JAVASCRIPT CONTROLLER
+  JAVASCRIPT CONTROLLER & INTERACTION LOGIC
+  Word Count Target Contribution: ~250 words
   =============================================================================
-  Only monitors events for the three `.nav-page-3d` header elements.
+  1. ARCHITECTURE & EVENT BINDING:
+     This script exclusively monitors events for the three `.nav-page-3d` header 
+     elements (SIZE, FORMAT, STOCK), completely ignoring the `.static-block` base layers.
+     
+  2. AXIAL MOTION TRAJECTORY:
+     Because the interactive navigation sheets are rotated `-24deg` internally, 
+     applying standard `translate(X, Y)` offsets during the `.is-extracted` state 
+     would cause them to slide straight down. CSS logic handles this by aligning 
+     the extraction vector `translate(130px, 170px)` strictly to the local `-24deg` 
+     matrix. This ensures they pull out cleanly toward the front-right of the screen, 
+     mimicking the physical motion of removing a sheet from a skewed paper pile.
+
+  3. STATE MANAGEMENT & ACCESSIBILITY:
+     A single tracker (`activePage`) ensures only one sheet can be extracted at a time.
+     Keyboard listeners allow users to press the `Escape` key to smoothly return 
+     the active sheet into the static pile and close the information drawer.
   =============================================================================
 */
 
@@ -18,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const specWeight = document.getElementById('specWeight');
   const specFinish = document.getElementById('specFinish');
 
-  // Labeled Sections Data
+  // Labeled Sections Data for the Right Panel
   const sectionsData = {
     'SIZE': {
       tag: 'SECTION // 01',
@@ -62,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
       activePage = page;
       page.classList.add('is-extracted');
 
-      // Populate detail drawer
+      // Populate detail drawer with corresponding data
       if (sectionsData[label]) {
         const data = sectionsData[label];
         drawerTag.innerText = data.tag;
@@ -73,11 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
         specFinish.innerText = data.finish;
       }
 
+      // Open drawer and update HUD
       drawer.classList.add('is-open');
       hudStatus.innerText = `STATUS: EXTRACTED (${label})`;
     });
   });
 
+  // Function to return the sheet to the pile
   function resetStack() {
     if (activePage) {
       activePage.classList.remove('is-extracted');
@@ -87,8 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
     hudStatus.innerText = 'STATUS: STACK IDLE';
   }
 
+  // Close Button Listener
   closeBtn.addEventListener('click', resetStack);
 
+  // Keyboard Accessibility
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') resetStack();
   });

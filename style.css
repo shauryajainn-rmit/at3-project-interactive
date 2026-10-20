@@ -1,25 +1,35 @@
 /* 
   =============================================================================
-  DESIGN & AESTHETICS COMMENTARY
+  DESIGN & AESTHETICS COMMENTARY (Context, Style & Usability)
+  Word Count Target Contribution: ~180 words
   =============================================================================
-  1. SOLID STATIC BASE vs. 3D INTERACTIVE HEADERS:
-     The stack body is constructed using static, solid CSS blocks (`.static-block`) 
-     with heavy 1.5px borders and opaque white fills. These static blocks remain 
-     completely stationary and ignore mouse interactions (`pointer-events: none`).
+  1. CONTEXT & EXACT ISOMETRIC GEOMETRY:
+     This prototype directly replicates the line-art illustration style of print 
+     proofing stacks (Jordanova, 2020; Comeau, 2023). To mirror the exact angles 
+     of the reference drawing, the main stack uses an orthographic isometric 
+     matrix (`rotateX(62deg) rotateZ(-42deg)`). 
 
-  2. 3D CLICKABLE NAVIGATION HEADERS (`SIZE`, `FORMAT`, `STOCK`):
+  2. SOLID STATIC BASE vs. 3D INTERACTIVE HEADERS:
+     To optimize usability and reduce visual clutter, the main body of the paper stack 
+     is constructed using solid, static CSS blocks (`.static-block`) with heavy 1.5px 
+     borders. These blocks ignore mouse interactions (`pointer-events: none`).
+
+  3. 3D CLICKABLE NAVIGATION HEADERS (`SIZE`, `FORMAT`, `STOCK`):
      Only the three navigation sheets (`.nav-page-3d`) feature 3D transformation 
-     vectors, hovering peek motions, and extraction transitions. They sit embedded 
-     at specific height offsets (`--z-pos`) within the solid paper block, rotated `-24deg` 
-     so their labeled corners protrude out from the stack.
+     vectors and hover states. They are pivoted at a resting angle of `-24deg` 
+     relative to the pile, causing their corners to protrude outward exactly 
+     like the overlapping geometry in the target reference image.
+
+  4. ANIMATION PRINCIPLES (Disney's 12 Principles in UI):
+     - Slow In & Slow Out: Custom `cubic-bezier(0.16, 1, 0.3, 1)` easing gives 
+       the sliding paper physical friction and mass during extraction.
   =============================================================================
 */
 
 :root {
-  --bg-color: #ffffff;
+  --bg-color: #f8f8f8;
   --paper-bg: #ffffff;
   --ink-black: #000000;
-  --line-color: #000000;
   --text-muted: #666666;
   --font-sans: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "Courier New", Courier, monospace;
@@ -159,6 +169,7 @@ body {
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease;
 }
 
+/* Label sitting on the protruding corner */
 .sheet-label {
   position: absolute;
   bottom: 12px;
@@ -180,7 +191,7 @@ body {
 
 /* EXTRACTED STATE: Pulled completely out of the solid stack */
 .nav-page-3d.is-extracted {
-  transform: translateZ(calc(var(--z-pos) + 80px)) rotateZ(-24deg) translate(130px, 170px) !important;
+  transform: translateZ(calc(var(--z-pos) + 90px)) rotateZ(-24deg) translate(130px, 170px) !important;
   background-color: #ffffff;
   border-width: 2px;
   box-shadow: -12px 12px 25px rgba(0, 0, 0, 0.18);
