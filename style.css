@@ -44,7 +44,12 @@ body {
     .background-text {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-}
+}/*
+
+https://www.joshwcomeau.com/css/
+:https://www.w3schools.com/css/css3_animations.asp
+https://www.joshwcomeau.com/animation/keyframe-animations/
+
 
 /* floating animation */
 @keyframes floatAround {
